@@ -13,16 +13,6 @@
 #include<sys/time.h>
 #include<sys/resource.h>
 
-int semID;
-
-union semun{
-  int val;
-  struct semid_ds *buf;
-  ushort *array;
-}seminfo;
-
-struct timeval startTime;
-
 //termination condition
 #define MAX_COWSHEEP 14
 #define MAX_TREASUREHUNTER 12
@@ -32,11 +22,28 @@ struct timeval startTime;
 //# of sheep and cows in one meal
 #define SHEEP_IN_MEAL 2
 #define COW_IN_MEAL 2
+
 // definitions of the semaphores
 #define MTX_DRAGONWAKEUP 0
 #define MTX_DRAGONEAT 1
 #define MTX_MEAL 2
-#define SEM_SHEEPINVALLEY 3
+#define MTX_SHEEPINVALLEY 3
+#define SEM_SHEEPINVALLEY 4
+
+//function initialization
+void initialize();
+void releaseResource();
+void semctlChecked(int semID, int semNum, int flag, union semun seminfo); 
+void semopChecked(int semID, struct sembuf *operation, unsigned num);
+
+int semID;
+union semun{
+  int val;
+  struct semid_ds *buf;
+  ushort *array;
+}seminfo;
+
+struct timeval startTime;
 
 //pointers to shared memory
 int *SheepInValley = NULL;
@@ -57,25 +64,27 @@ struct sembuf SignalDragonEat = {MTX_DRAGONEAT, 1, 0};
 struct sembuf WaitMeal = {MTX_MEAL, -1, 0};
 struct sembuf SignalMeal = {MTX_MEAL, 1, 0};
 
-// sheep in valley
+//mutex sheep in valley
+struct sembuf WaitMutexSheepInValley = {MTX_SHEEPINVALLEY, -1, 0};
+struct sembuf SignalMutexSheepInValley = {MTX_SHEEPINVALLEY, 1, 0};
+
+//semaphore sheep in valley
 struct sembuf WaitSheepInValley={SEM_SHEEPINVALLEY, -1, 0};
 struct sembuf SignalSheepInValley={SEM_SHEEPINVALLEY, 1, 0};
 
 
-void initialize();
-void releaseResource();
-void semctlChecked(int semID, int semNum, int flag, union semun seminfo); 
-void semopChecked(int semID, struct sembuf *operation, unsigned num);
-
 void initialize() {
-	semID = semget(IPC_PRIVATE, 4, 0666 | IPC_CREAT);
+	semID = semget(IPC_PRIVATE, 5, 0666 | IPC_CREAT);
+
+  //initialize values of semaphore
 	seminfo.val = 0;
   semctlChecked(semID, SEM_SHEEPINVALLEY, SETVAL, seminfo);
-
+  //initialize values of mutex
   seminfo.val = 1;
 	semctlChecked(semID, MTX_DRAGONWAKEUP, SETVAL, seminfo);
   semctlChecked(semID, MTX_DRAGONEAT, SETVAL, seminfo);
   semctlChecked(semID, MTX_MEAL, SETVAL, seminfo);
+  semctlChecked(semID, MTX_SHEEPINVALLEY, SETVAL, seminfo);
 
   //allocate shared memory
   if(SheepInValleyFlag=shmget(IPC_PRIVATE, sizeof(int), IPC_CREAT|0666) < 0) {
@@ -136,22 +145,61 @@ void semopChecked(int semID, struct sembuf *operation, unsigned num) {
 }
 
 void smaug() {
+  pid_t localid;
+  localid = getpid();
+  printf("ProcessID of smaug:%d\n", localid);
+  printf("Smaug is sleeping\n");
+  semopChecked(semID, &WaitDragonWakeUp, 1);
+  printf("Smaug is awake");
 	int time = 0;
 	while(1) {
-		printf("smaug is going to sleep\n");
-		semopChecked(semID, &WaitDragonWakeUp, 1);
-		printf("smaug wakes up and play for a while\n");
-		time ++;
-		usleep(1000000);
-		if(time==3) exit(0);
+    semopChecked(semID, &WaitMeal, 1);
+    if(*numMeals>0) *numMeals = *numMeals - 1;
+    printf("smaug eats one meal, %d meals left\n", numMeals);
+    if(*numMeals>0) *numMeals = *numMeals - 1;
+    printf("smaug eats another meal, %d meals left\n", numMeals);
+    semopChecked(semID, &SignalMeal, 1);
+    semopChecked(semID, &WaitDragonWakeUp, 1);
 	}
 }
+void graze(int time) {
+  if( usleep( startTimeN) == -1){
+    /* exit when usleep interrupted by kill signal */
+    if(errno==EINTR)exit(4);
+  }
+}
 
-void sheep() {
+void sheep(int time) {
+  pid_t localpid = getpid();
+  printf("sheep %d is grazing for %d usec\n", localpid, time);
+  graze(time);
+  printf("sheep is enchanted:%d\n", localpid);
+  //the sheep is enchanted
+  semopChecked(semID, &WaitMutexSheepInValley, 1);
+  semopChecked(semID, &SignalSheepInValley, 1);
+  *SheepInValley = *SheepInValley + 1;
+  printf("Now %d sheep in the valley\n",*SheepInValley);
+  if(*SheepInValley >= SHEEP_IN_MEAL) {
+    int i;
+    for(i=0;i<SHEEP_IN_MEAL) {
+      semopChecked(semID, &WaitSheepInValley, 1);
+    }
+    *SheepInValley = *SheepInValley - SHEEP_IN_MEAL;
+    semopChecked(semID, &WaitMeal, 1);
+    *numMeals = *numMeals + 1;
+    printf("A new meal is added, now number of meals:%d\n", numMeals);
+    semopChecked(semID, &SignalMeal, 1);
+    semopChecked(semID, &SignalDragonWakeUp, 1);
+    printf("the new meal ");
+  }
+  semopChecked(semID, &SignalMutexSheepInValley, 1);
+
+
 }
 int main(void) {
 	initialize();
 	pid_t result = fork();
+  srand(time(NULL));
 
 	if(result<0) {
 		printf("fork error\n");
@@ -161,13 +209,12 @@ int main(void) {
 		smaug();
 	}
 	else {	
-		int i;
-		for(i=0;i<5;i++) {
-			usleep(2000000);
-			semopChecked(semID, &SignalDragonWakeUp, 1);
-		}
-		int status;
-		waitpid(-1,&status,0);
-		printf("all processes has exited\n");
-	}
+    pid_t r;
+    while(1) {
+      r = fork();
+      if(r==0) break;
+    }
+    int rn = random();
+    sheep(rn%5555);
+  }
 }
