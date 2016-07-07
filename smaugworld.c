@@ -1,45 +1,13 @@
-#include <errno.h> 
-#include <wait.h> 
-#include <stdlib.h> 
-#include <stdio.h>
-#include <unistd.h>
-#include <curses.h>
-#include <time.h>
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/sem.h>
-#include <sys/shm.h>
-#include <sys/time.h>
-#include <sys/resource.h> 
-
-//termination condition
-#define MAX_COWSHEEP 14
-#define MAX_TREASUREHUNTER 12
-#define MAX_THIEF 15
-#define MAX_JEWEL 800
-
-//# of sheep and cows in one meal
-#define SHEEP_IN_MEAL 2
-#define COW_IN_MEAL 2
-
-// definitions of the semaphores
-#define MTX_DRAGONWAKEUP 0 //wake up the dragon
-#define MTX_DRAGONEAT 1    //the dragon eats
-#define MTX_MEAL 2         //num of meals in the valley
-#define MTX_SHEEPEATEN 3   //number of eaten sheep
-#define MTX_MEALEATEN 4    //number of eaten meal
-#define MTX_SHEEPINVALLEY 5//number of sheep in valley
-#define SEM_SHEEPINVALLEY 6//semaphore of sheep in valley
-#define SEM_SHEEPEATEN 7   //semaphore of eaten sheep
-
+#include "smaugworld.h"
+#include "sheep.h"
+#include "smaug.h"
+//global variables
 int semID;
 union semun{
   int val;
   struct semid_ds *buf;
   ushort *array;
-}seminfo;
-
+} seminfo;
 struct timeval startTime;
 
 //pointers to shared memory
@@ -85,13 +53,7 @@ struct sembuf SignalSheepInValley={SEM_SHEEPINVALLEY, 1, 0};
 struct sembuf WaitSheepEaten = {SEM_SHEEPEATEN, -1, 0};
 struct sembuf SignalSheepEaten = {SEM_SHEEPEATEN, 1, 0};
 
-//function initialization
-void initialize();
-void releaseResource();
-void semctlChecked(int semID, int semNum, int flag, union semun seminfo); 
-void semopChecked(int semID, struct sembuf *operation, unsigned num);
-
-
+//function definitions
 void initialize() {
 	semID = semget(IPC_PRIVATE, 8, 0666 | IPC_CREAT);
 
@@ -188,81 +150,6 @@ void semopChecked(int semID, struct sembuf *operation, unsigned num) {
 	}
 }
 
-void smaug() {
-	pid_t localid;
-	localid = getpid();
-	printf("ProcessID of smaug:%d\n", localid);
-	printf("Smaug is sleeping\n");
-	semopChecked(semID, &WaitMutexDragonWakeUp, 1);
-	int time = 0;
-	while(1) {
-		printf("Smaug is awake\n");
-		semopChecked(semID, &WaitMutexMeal, 1);
-		if(*numMeals>0) {
-			*numMeals = *numMeals - 1;
-			printf("smaug eats one meal, %d meals left\n", *numMeals);
-			semopChecked(semID, &WaitMutexDragonEat, 1);
-
-			semopChecked(semID, &WaitMutexMealEaten, 1);	
-			*numMealsEaten = *numMealsEaten + 1;
-			int i=0;
-			for (i = 0 ; i < SHEEP_IN_MEAL ; i++) {
-				semopChecked(semID, &SignalSheepEaten, 1);
-			}
-			semopChecked(semID, &SignalMutexMealEaten, 1);
-		}
-		semopChecked(semID, &SignalMutexMeal, 1);
-
-
-		semopChecked(semID, &WaitMutexMeal, 1);
-		if(*numMeals>0) {
-			*numMeals = *numMeals - 1;
-			printf("smaug eats another meal, %d meals left\n", *numMeals);
-		}
-		semopChecked(semID, &SignalMutexMeal, 1);
-		printf("Smaug finishes snacks and goes sleeping\n");
-		
-		semopChecked(semID, &WaitMutexDragonWakeUp, 1);
-	}
-}
-void graze(int time) {
-	if( usleep(time) == -1){
-		/* exit when usleep interrupted by kill signal */
-		if(errno==EINTR)exit(4);
-	}
-}
-
-void sheep(int time) {
-	pid_t localpid = getpid();
-	printf("sheep %d is grazing for %d usec\n", localpid, time);
-	graze(time);
-	printf("sheep is enchanted:%d\n", localpid);
-	//the sheep is enchanted
-	semopChecked(semID, &WaitMutexSheepInValley, 1);
-	semopChecked(semID, &SignalSheepInValley, 1);
-	*SheepInValley = *SheepInValley + 1;
-	printf("Now %d sheep in the valley\n",*SheepInValley);
-	if(*SheepInValley >= SHEEP_IN_MEAL) {
-		int i;
-		for(i=0;i<SHEEP_IN_MEAL;i++) {
-			semopChecked(semID, &WaitSheepInValley, 1);
-		}
-		*SheepInValley = *SheepInValley - SHEEP_IN_MEAL;
-		semopChecked(semID, &WaitMutexMeal, 1);
-		*numMeals = *numMeals + 1;
-		printf("A new meal is added, now number of meals:%d\n", *numMeals);
-		semopChecked(semID, &SignalMutexMeal, 1);
-		semopChecked(semID, &SignalMutexDragonWakeUp, 1);
-	}
-	semopChecked(semID, &SignalMutexSheepInValley, 1);
-	
-	//sheep goes into the queue waiting to be eaten
-	semopChecked(semID, &WaitSheepEaten, 1);
-	semopChecked(semID, &WaitMutexSheepEaten, 1);
-	*numSheepEaten = *numSheepEaten + 1;
-	semopChecked(semID, &SignalMutexSheepEaten, 1);
-	printf("Sheep %d is eaten\n", localpid);
-}
 int main(void) {
 	initialize();
 	pid_t result = fork();
