@@ -10,7 +10,7 @@ void smaug() {
 		printf("Smaug is awake\n");
 		semopChecked(semID, &WaitPNumMeal, 1);
 		if(*numMeal>0) {
-			semopChecked(semID, &WaitNMeal, 1);
+			semopChecked(semID, &WaitNNumMeal, 1);
 			int i;
 			for( i = 0 ; i < SHEEP_IN_MEAL ; i++ ) {
 				semopChecked(semID, &SignalSSheepWaiting, 1);
@@ -35,9 +35,9 @@ void smaug() {
 		for( j = 0; j<SHEEP_IN_MEAL ; j++) {
 			semopChecked(semID, &WaitSSheepDie, 1);
 			*numSheepEaten = *numSheepEaten + 1;
-			printf("Smaug eats one more Sheep, now %d sheep eaten\n", *numSheepEaten);
+			printf("Smaug eats one more Sheep, now %d sheep eaten\n");
 		}
-		semopChecked(semID, &WaitSDragonWakeUp, 1);
+		semopChecked(semID, &SignalSDragonWakeUp, 1);
 	}
 }
 

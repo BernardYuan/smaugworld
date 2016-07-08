@@ -60,6 +60,9 @@ struct sembuf SignalPSheepToEat = {SEM_P_SHEEPTOEAT, 1, 0};
 // sheep eaten
 struct sembuf WaitSSheepEaten = {SEM_S_SHEEPEATEN, -1, 0};
 struct sembuf SignalSSheepEaten = {SEM_S_SHEEPEATEN, 1, 0};
+// protecting sheep eaten
+struct sembuf WaitPSheepEaten = {SEM_P_SHEEPEATEN, -1, 0};
+struct sembuf SignalPSheepEaten = {SEM_P_SHEEPEATEN, 1, 0};
 // sheep die
 struct sembuf WaitSSheepDie = {SEM_S_SHEEPDIE, -1, 0};
 struct sembuf SignalSSheepDie = {SEM_S_SHEEPDIE, 1, 0};
@@ -74,7 +77,7 @@ void initialize() {
 	semctlChecked(semID, SEM_S_DRAGONEAT, SETVAL, seminfo);
 	semctlChecked(semID, SEM_N_MEAL, SETVAL, seminfo);
 	semctlChecked(semID, SEM_N_SHEEPINVALLEY, SETVAL, seminfo);
-	semctlChecked(semID, SEM_N_SHEEPWAITING, SETVAL, seminfo);
+	semctlChecked(semID, SEM_S_SHEEPWAITING, SETVAL, seminfo);
 	semctlChecked(semID, SEM_N_SHEEPTOEAT, SETVAL, seminfo);
 	semctlChecked(semID, SEM_S_SHEEPEATEN, SETVAL, seminfo);
 	semctlChecked(semID, SEM_S_SHEEPDIE, SETVAL, seminfo);
@@ -131,6 +134,7 @@ void semopChecked(int semID, struct sembuf *operation, unsigned num) {
 		}
 	}
 }
+// function for allocating shared memory and attach it to the address provided
 void shmAllocate(key_t key, size_t size, int shmflg1, const void *shmaddr, int shmflg2, int *flag, int **addr) {
 	//allocate shared memory
 	if((*flag=shmget(key, size, shmflg1)) < 0) {
