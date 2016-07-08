@@ -24,59 +24,68 @@
 #define SHEEP_IN_MEAL 2
 #define COW_IN_MEAL 2
 
-// definitions of the semaphores
-#define MTX_DRAGONWAKEUP 0 //wake up the dragon
-#define MTX_DRAGONEAT 1    //the dragon eats
-#define MTX_MEAL 2         //num of meals in the valley
-#define MTX_SHEEPEATEN 3   //number of eaten sheep
-#define MTX_MEALEATEN 4    //number of eaten meal
-#define MTX_SHEEPINVALLEY 5//number of sheep in valley
-#define SEM_SHEEPINVALLEY 6//semaphore of sheep in valley
-#define SEM_SHEEPEATEN 7   //semaphore of eaten sheep
+// semaphores of the state of the dragon
+#define SEM_S_DRAGONWAKEUP   0
+extern struct sembuf WaitSDragonWakeUp;
+extern struct sembuf SignalSDragonWakeUp;
+#define SEM_S_DRAGONEAT      1
+extern struct sembuf WaitSDragonEat;
+extern struct sembuf SignalSDragonEat;
+
+//semahpores of meals
+#define SEM_N_MEAL           2
+extern struct sembuf WaitNMeal;
+extern struct sembuf SignalNMeal;
+#define SEM_P_NUMMEAL           3
+extern int  numMealFlag;
+extern int *numMeal;
+extern struct sembuf WaitPNumMeal;
+extern struct sembuf SignalPNumMeal;
+#define SEM_P_EATENMEAL      4
+extern int  numEatenMealFlag;
+extern int *numEatenMeal;
+extern struct sembuf WaitPEatenMeal;
+extern struct sembuf SignalPEatenMeal;
+
+//semaphores of sheep
+#define SEM_N_SHEEPINVALLEY  5
+extern struct sembuf WaitNSheepInValley;
+extern struct sembuf SignalNSheepInValley;
+#define SEM_P_SHEEPINVALLEY  6
+extern int  SheepInValleyFlag;
+extern int *SheepInValley;
+extern struct sembuf WaitPSheepInValley;
+extern struct sembuf SignalPSheepInValley;
+#define SEM_S_SHEEPWAITING   7
+extern struct sembuf WaitSSheepWaiting;
+extern struct sembuf SignalSSheepWaiting;
+#define SEM_N_SHEEPTOEAT    8
+extern struct sembuf WaitNSheepToEat;
+extern struct sembuf SignalNSheepToEat;
+#define SEM_P_SHEEPTOEAT    9
+extern int  numSheepToEatFlag;
+extern int *numSheepToEat;
+extern struct sembuf WaitPSheepToEat;
+extern struct sembuf SignalPSheepToEat;
+#define SEM_S_SHEEPEATEN     10
+extern struct sembuf WaitSSheepEaten;
+extern struct sembuf SignalSSheepEaten;
+#define SEM_P_SHEEPEATEN     11
+extern int  numSheepEatenFlag;
+extern int *numSheepEaten;
+extern struct sembuf WaitPSheepEaten;
+extern struct sembuf SignalPSheepEaten;
+#define SEM_S_SHEEPDIE	     12
+extern struct sembuf WaitSSheepDie;
+extern struct sembuf SignalSSheepDie;
+
 //function initialization
 void initialize();
 void releaseResource();
 void semctlChecked(int semID, int semNum, int flag, union semun seminfo); 
 void semopChecked(int semID, struct sembuf *operation, unsigned num);
+void shmAllocate(key_t key, size_t size, int shmflg1, const void *shmaddr, int shmflg2, int *flag, int **addr);
 
 //make variables external so that they are visible in other files
 extern int semID;
-extern int *SheepInValley;
-extern int *numMeals;
-extern int *numMealsEaten;
-extern int *numSheepEaten;
-
 extern union semun seminfo;
-// semaphore buffers 
-// dragon sleep:
-extern struct sembuf WaitMutexDragonWakeUp;
-extern struct sembuf SignalMutexDragonWakeUp;
-
-//dragon eat:
-extern struct sembuf WaitMutexDragonEat;
-extern struct sembuf SignalMutexDragonEat;
-
-//mutex on meal
-extern struct sembuf WaitMutexMeal;
-extern struct sembuf SignalMutexMeal;
-
-//mutex on sheep eaten
-extern struct sembuf WaitMutexSheepEaten;
-extern struct sembuf SignalMutexSheepEaten;
-
-//mutex on meal eaten
-extern struct sembuf WaitMutexMealEaten;
-extern struct sembuf SignalMutexMealEaten;
-
-//mutex sheep in valley
-extern struct sembuf WaitMutexSheepInValley;
-extern struct sembuf SignalMutexSheepInValley;
-
-//semaphore sheep in valley
-extern struct sembuf WaitSheepInValley;
-extern struct sembuf SignalSheepInValley;
-
-//semaphore sheep eaten by dragon
-extern struct sembuf WaitSheepEaten;
-extern struct sembuf SignalSheepEaten;
-

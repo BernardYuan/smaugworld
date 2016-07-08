@@ -11,117 +11,99 @@ union semun{
 struct timeval startTime;
 
 //pointers to shared memory
-int *SheepInValley = NULL;
+int  numMealFlag = 0;
+int *numMeal = NULL;
+int  numEatenMealFlag = 0;
+int *numEatenMeal = NULL;
 int  SheepInValleyFlag = 0;
-int *numMeals = NULL;
-int  numMealsFlag = 0;
-int *numMealsEaten = NULL;
-int  numMealsEatenFlag = 0;
-int *numSheepEaten = NULL;
+int *SheepInValley = NULL;
+int  numSheepToEatFlag = 0;
+int *numSheepToEat = NULL;
 int  numSheepEatenFlag = 0;
+int *numSheepEaten = NULL;
 
-// semaphore buffers 
-// dragon sleep:
-struct sembuf WaitMutexDragonWakeUp={MTX_DRAGONWAKEUP, -1, 0};
-struct sembuf SignalMutexDragonWakeUp={MTX_DRAGONWAKEUP, 1, 0};
+//semaphores of dragon
+//Dragon Wake up
+struct sembuf WaitSDragonWakeUp = {SEM_S_DRAGONWAKEUP, -1, 0};
+struct sembuf SignalSDragonWakeUp = {SEM_S_DRAGONWAKEUP, 1, 0};
+//Dragon Eat
+struct sembuf WaitSDragonEat = {SEM_S_DRAGONEAT, -1, 0};
+struct sembuf SignalSDragonEat = {SEM_S_DRAGONEAT, 1, 0};
 
-//dragon eat:
-struct sembuf WaitMutexDragonEat = {MTX_DRAGONEAT, -1, 0};
-struct sembuf SignalMutexDragonEat = {MTX_DRAGONEAT, 1, 0};
+//semaphores of meal
+//number of meals
+struct sembuf WaitNMeal = {SEM_N_MEAL, -1, 0};
+struct sembuf SignalNMeal = {SEM_N_MEAL, 1, 0};
+//protecting number of meal shared memory
+struct sembuf WaitPNumMeal = {SEM_P_NUMMEAL, -1, 0};
+struct sembuf SignalPNumMeal = {SEM_P_NUMMEAL, 1, 0};
+//protecting shared memory variable number of eaten meals
+struct sembuf WaitPEatenMeal = {SEM_P_EATENMEAL, -1, 0};
+struct sembuf SignalPEatenMeal = {SEM_P_EATENMEAL, 1, 0};
 
-//mutex on meal
-struct sembuf WaitMutexMeal = {MTX_MEAL, -1, 0};
-struct sembuf SignalMutexMeal = {MTX_MEAL, 1, 0};
-
-//mutex on sheep eaten
-struct sembuf WaitMutexSheepEaten = {MTX_SHEEPEATEN, -1, 0};
-struct sembuf SignalMutexSheepEaten = {MTX_SHEEPEATEN, 1, 0};
-
-//mutex on meal eaten
-struct sembuf WaitMutexMealEaten = {MTX_MEALEATEN, -1, 0};
-struct sembuf SignalMutexMealEaten = {MTX_MEALEATEN, 1, 0};
-
-//mutex sheep in valley
-struct sembuf WaitMutexSheepInValley = {MTX_SHEEPINVALLEY, -1, 0};
-struct sembuf SignalMutexSheepInValley = {MTX_SHEEPINVALLEY, 1, 0};
-
-//semaphore sheep in valley
-struct sembuf WaitSheepInValley={SEM_SHEEPINVALLEY, -1, 0};
-struct sembuf SignalSheepInValley={SEM_SHEEPINVALLEY, 1, 0};
-
-//semaphore sheep eaten by dragon
-struct sembuf WaitSheepEaten = {SEM_SHEEPEATEN, -1, 0};
-struct sembuf SignalSheepEaten = {SEM_SHEEPEATEN, 1, 0};
+//semaphores of sheep
+//number of sheep in Valley
+struct sembuf WaitNSheepInValley = {SEM_N_SHEEPINVALLEY, -1, 0};
+struct sembuf SignalNSheepInValley = {SEM_N_SHEEPINVALLEY, 1, 0};
+//protecting the shared variable of number of sheep in Valley
+struct sembuf WaitPSheepInValley = {SEM_P_SHEEPINVALLEY, -1, 0};
+struct sembuf SignalPSheepInValley = {SEM_P_SHEEPINVALLEY, 1, 0};
+//sheep waiting to be eaten
+struct sembuf WaitSSheepWaiting = {SEM_S_SHEEPWAITING, -1, 0};
+struct sembuf SignalSSheepWaiting = {SEM_S_SHEEPWAITING, 1, 0};
+// semaphore of sheep to eat
+struct sembuf WaitNSheepToEat = {SEM_N_SHEEPTOEAT, -1, 0};
+struct sembuf SignalNSheepToEat = {SEM_N_SHEEPTOEAT, 1, 0};
+// protecting the shared variable sheep to eat
+struct sembuf WaitPSheepToEat = {SEM_P_SHEEPTOEAT, -1, 0};
+struct sembuf SignalPSheepToEat = {SEM_P_SHEEPTOEAT, 1, 0};
+// sheep eaten
+struct sembuf WaitSSheepEaten = {SEM_S_SHEEPEATEN, -1, 0};
+struct sembuf SignalSSheepEaten = {SEM_S_SHEEPEATEN, 1, 0};
+// sheep die
+struct sembuf WaitSSheepDie = {SEM_S_SHEEPDIE, -1, 0};
+struct sembuf SignalSSheepDie = {SEM_S_SHEEPDIE, 1, 0};
 
 //function definitions
 void initialize() {
-	semID = semget(IPC_PRIVATE, 8, 0666 | IPC_CREAT);
+	semID = semget(IPC_PRIVATE, 13, 0666 | IPC_CREAT);
 
 	//initialize values of semaphore
 	seminfo.val = 0;
-	semctlChecked(semID, MTX_DRAGONWAKEUP, SETVAL, seminfo);
-	semctlChecked(semID, SEM_SHEEPINVALLEY, SETVAL, seminfo);
-	semctlChecked(semID, SEM_SHEEPEATEN, SETVAL, seminfo);
+	semctlChecked(semID, SEM_S_DRAGONWAKEUP, SETVAL, seminfo);
+	semctlChecked(semID, SEM_S_DRAGONEAT, SETVAL, seminfo);
+	semctlChecked(semID, SEM_N_MEAL, SETVAL, seminfo);
+	semctlChecked(semID, SEM_N_SHEEPINVALLEY, SETVAL, seminfo);
+	semctlChecked(semID, SEM_N_SHEEPWAITING, SETVAL, seminfo);
+	semctlChecked(semID, SEM_N_SHEEPTOEAT, SETVAL, seminfo);
+	semctlChecked(semID, SEM_S_SHEEPEATEN, SETVAL, seminfo);
+	semctlChecked(semID, SEM_S_SHEEPDIE, SETVAL, seminfo);
 
 	//initialize values of mutex
 	seminfo.val = 1;
-	semctlChecked(semID, MTX_DRAGONEAT, SETVAL, seminfo);
-	semctlChecked(semID, MTX_MEAL, SETVAL, seminfo);
-	semctlChecked(semID, MTX_MEALEATEN, SETVAL, seminfo);
-	semctlChecked(semID, MTX_SHEEPEATEN, SETVAL, seminfo);
-	semctlChecked(semID, MTX_SHEEPINVALLEY, SETVAL, seminfo);
+	semctlChecked(semID, SEM_P_NUMMEAL, SETVAL, seminfo);
+	semctlChecked(semID, SEM_P_EATENMEAL, SETVAL, seminfo);
+	semctlChecked(semID, SEM_P_SHEEPINVALLEY, SETVAL, seminfo);
+	semctlChecked(semID, SEM_P_SHEEPTOEAT, SETVAL, seminfo);
+	semctlChecked(semID, SEM_P_SHEEPEATEN, SETVAL, seminfo);
+	
+//int  numMealFlag = 0;
+//int *numMeal = NULL;
+//int  numEatenMealFlag = 0;
+//int *numEatenMeal = NULL;
+//int  SheepInValleyFlag = 0;
+//int *SheepInValley = NULL;
+//int  numSheepToEatFlag = 0;
+//int *numSheepToEat = NULL;
+//int  numSheepEatenFlag = 0;
+//int *numSheepEaten = NULL;
 
 	//allocate shared memory
-	if((SheepInValleyFlag=shmget(IPC_PRIVATE, sizeof(int), IPC_CREAT|0666)) < 0) {
-		printf("CREATE SheepInValleyFlag error\n");
-		exit(1);
-	}else {
-		printf("CREATE SheepInValleyFlag Success, %d\n", SheepInValleyFlag);
-	}
-	if((numMealsFlag = shmget(IPC_PRIVATE, sizeof(int), IPC_CREAT|0666)) < 0) {
-		printf("CREATE numMealsFlag error\n");
-		exit(1);
-	}else {
-		printf("CREATE numMealsFlag Success, %d\n", numMealsFlag);
-	}
-	if((numMealsEatenFlag = shmget(IPC_PRIVATE, sizeof(int), IPC_CREAT|0666)) < 0) {
-		printf("CREATE numMealsEatenFlag error\n");
-		exit(1);
-	}else {
-		printf("CREATE numMealsEatenFlag Success, %d\n", numMealsEatenFlag);
-	}
-	if((numSheepEatenFlag = shmget(IPC_PRIVATE, sizeof(int), IPC_CREAT|0666)) < 0) {
-		printf("CREATE numSheepEatenFlag error\n");
-		exit(1);
-	}else {
-		printf("CREATE numSheepEatenFlag Success, %d\n", numSheepEatenFlag);
-	}
-
-	//attach shared memory
-	if((SheepInValley = shmat(SheepInValleyFlag, NULL, 0))==(int *) -1) {
-		printf("Attach Shared Memory SheepInValley Error\n");
-		exit(1);
-	}else {
-		printf("Attach Shared Memory SheepInValley Success\n");
-	}
-	if((numMeals = shmat(numMealsFlag, NULL, 0)) == (int *) -1) {
-		printf("Attach Shared Memory numMeals Error\n");
-		exit(1);
-	}else {
-		printf("Attach Shared Memory numMeals Success\n");
-	}
-	if((numMealsEaten = shmat(numMealsEatenFlag, NULL, 0)) == (int *) -1) {
-		printf("Attach Shared Memory numMealsEaten Error\n");
-		exit(1);
-	}else {
-		printf("Attach Shared Memory numMealsEaten Success\n");
-	}
-	if((numSheepEaten = shmat(numSheepEatenFlag, NULL, 0)) == (int *) -1) {
-		printf("Attach Shared Memory numSheepEaten Error\n");
-		exit(1);
-	}else {
-		printf("Attach Shared Memory numSheepEaten Success\n");
-	}
+	shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT|0666, NULL, 0, &numMealFlag, &numMeal);
+	shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT|0666, NULL, 0, &numEatenMealFlag, &numEatenMeal);
+	shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT|0666, NULL, 0, &SheepInValleyFlag, &SheepInValley);
+	shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT|0666, NULL, 0, &numSheepToEatFlag, &numSheepToEat);
+	shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT|0666, NULL, 0, &numSheepEatenFlag, &numSheepEaten);
 }
 
 void semctlChecked(int semID, int semNum, int flag, union semun seminfo) {
@@ -147,6 +129,23 @@ void semopChecked(int semID, struct sembuf *operation, unsigned num) {
 		else {
 			exit(3);
 		}
+	}
+}
+void shmAllocate(key_t key, size_t size, int shmflg1, const void *shmaddr, int shmflg2, int *flag, int **addr) {
+	//allocate shared memory
+	if((*flag=shmget(key, size, shmflg1)) < 0) {
+		printf("CREATE shared memory error\n");
+		exit(1);
+	}else {
+		printf("CREATE shared memory success, %d\n", *flag);
+	}
+
+	//attach shared memory
+	if((*addr = shmat(*flag, shmaddr, shmflg2))==(int *) -1) {
+		printf("Attach Shared Memory Error\n");
+		exit(1);
+	}else {
+		printf("Attach Shared Memory Success\n");
 	}
 }
 
