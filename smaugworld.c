@@ -90,7 +90,7 @@ struct sembuf WaitSCowWaiting = {SEM_S_COWWAITING, -1, 0};
 struct sembuf SignalSCowWaiting = {SEM_S_COWWAITING, 1, 0};
 //cow to eat
 struct sembuf WaitNCowToEat = {SEM_N_COWTOEAT, -1, 0};
-struct sembuf SignalCowToEat = {SEM_N_COWTOEAT, 1, 0};
+struct sembuf SignalNCowToEat = {SEM_N_COWTOEAT, 1, 0};
 //protector cow to eat
 struct sembuf WaitPCowToEat = {SEM_P_COWTOEAT, -1, 0};
 struct sembuf SignalPCowToEat = {SEM_P_COWTOEAT, 1, 0};
