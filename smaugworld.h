@@ -37,12 +37,12 @@ extern struct sembuf SignalSDragonEat;
 extern struct sembuf WaitNMeal;
 extern struct sembuf SignalNMeal;
 #define SEM_P_NUMMEAL           3
-extern int  numMealFlag;
+extern int numMealFlag;
 extern int *numMeal;
 extern struct sembuf WaitPNumMeal;
 extern struct sembuf SignalPNumMeal;
 #define SEM_P_EATENMEAL      4
-extern int  numEatenMealFlag;
+extern int numEatenMealFlag;
 extern int *numEatenMeal;
 extern struct sembuf WaitPEatenMeal;
 extern struct sembuf SignalPEatenMeal;
@@ -52,7 +52,7 @@ extern struct sembuf SignalPEatenMeal;
 extern struct sembuf WaitNSheepInValley;
 extern struct sembuf SignalNSheepInValley;
 #define SEM_P_SHEEPINVALLEY  6
-extern int  SheepInValleyFlag;
+extern int SheepInValleyFlag;
 extern int *SheepInValley;
 extern struct sembuf WaitPSheepInValley;
 extern struct sembuf SignalPSheepInValley;
@@ -63,7 +63,7 @@ extern struct sembuf SignalSSheepWaiting;
 extern struct sembuf WaitNSheepToEat;
 extern struct sembuf SignalNSheepToEat;
 #define SEM_P_SHEEPTOEAT    9
-extern int  numSheepToEatFlag;
+extern int numSheepToEatFlag;
 extern int *numSheepToEat;
 extern struct sembuf WaitPSheepToEat;
 extern struct sembuf SignalPSheepToEat;
@@ -71,20 +71,25 @@ extern struct sembuf SignalPSheepToEat;
 extern struct sembuf WaitSSheepEaten;
 extern struct sembuf SignalSSheepEaten;
 #define SEM_P_SHEEPEATEN     11
-extern int  numSheepEatenFlag;
+extern int numSheepEatenFlag;
 extern int *numSheepEaten;
 extern struct sembuf WaitPSheepEaten;
 extern struct sembuf SignalPSheepEaten;
-#define SEM_S_SHEEPDIE	     12
+#define SEM_S_SHEEPDIE         12
 extern struct sembuf WaitSSheepDie;
 extern struct sembuf SignalSSheepDie;
 
 //make variables external so that they are visible in other files
 extern int semID;
 extern union semun seminfo;
+
 //function initialization
 void initialize();
+
 void releaseResource();
-void semctlChecked(int semID, int semNum, int flag, union semun seminfo); 
+
+void semctlChecked(int semID, int semNum, int flag, union semun seminfo);
+
 void semopChecked(int semID, struct sembuf *operation, unsigned num);
+
 void shmAllocate(key_t key, size_t size, int shmflg1, const void *shmaddr, int shmflg2, int *flag, int **addr);
