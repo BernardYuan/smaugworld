@@ -13,8 +13,7 @@
   <component name="ChangeListManager">
     <list default="true" id="7c73198f-4199-4625-b140-9c2bb7fbcf30" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Makefile" afterPath="$PROJECT_DIR$/Makefile" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/smaugworld.c" afterPath="$PROJECT_DIR$/smaugworld.c" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/smaug.c" afterPath="$PROJECT_DIR$/smaug.c" />
     </list>
     <ignored path="smaugworld.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -38,18 +37,18 @@
       <file leaf-file-name="smaugworld.h" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/smaugworld.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="95" column="36" selection-start-line="95" selection-start-column="21" selection-end-line="95" selection-end-column="36" />
+            <state relative-caret-position="240">
+              <caret line="101" column="28" selection-start-line="101" selection-start-column="28" selection-end-line="101" selection-end-column="28" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="smaugworld.c" pinned="false" current-in-tab="true">
+      <file leaf-file-name="smaugworld.c" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/smaugworld.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
-              <caret line="92" column="21" selection-start-line="92" selection-start-column="21" selection-end-line="92" selection-end-column="21" />
+            <state relative-caret-position="225">
+              <caret line="96" column="11" selection-start-line="96" selection-start-column="11" selection-end-line="96" selection-end-column="11" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -117,11 +116,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="smaug.c" pinned="false" current-in-tab="false">
+      <file leaf-file-name="smaug.c" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/smaug.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="194">
-              <caret line="34" column="36" selection-start-line="34" selection-start-column="36" selection-end-line="34" selection-end-column="36" />
+            <state relative-caret-position="404">
+              <caret line="47" column="12" selection-start-line="47" selection-start-column="12" selection-end-line="47" selection-end-column="12" />
               <folding />
             </state>
           </provider>
@@ -139,11 +138,11 @@
         <option value="$PROJECT_DIR$/smaugworld.h" />
         <option value="$PROJECT_DIR$/sheep.h" />
         <option value="$PROJECT_DIR$/cow.h" />
-        <option value="$PROJECT_DIR$/smaug.c" />
         <option value="$PROJECT_DIR$/cow.c" />
         <option value="$PROJECT_DIR$/sheep.c" />
         <option value="$PROJECT_DIR$/Makefile" />
         <option value="$PROJECT_DIR$/smaugworld.c" />
+        <option value="$PROJECT_DIR$/smaug.c" />
       </list>
     </option>
   </component>
@@ -328,19 +327,21 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/smaug.c">
+    <entry file="file://$PROJECT_DIR$/smaugworld.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="194">
-          <caret line="34" column="36" selection-start-line="34" selection-start-column="36" selection-end-line="34" selection-end-column="36" />
+        <state relative-caret-position="240">
+          <caret line="101" column="28" selection-start-line="101" selection-start-column="28" selection-end-line="101" selection-end-column="28" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/smaug.h">
+    <entry file="file://$PROJECT_DIR$/smaugworld.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="5" selection-start-line="2" selection-start-column="5" selection-end-line="2" selection-end-column="5" />
-          <folding />
+        <state relative-caret-position="225">
+          <caret line="96" column="11" selection-start-line="96" selection-start-column="11" selection-end-line="96" selection-end-column="11" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -368,14 +369,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/cow.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="765">
-          <caret line="51" column="19" selection-start-line="51" selection-start-column="19" selection-end-line="51" selection-end-column="19" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/cow.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="15">
@@ -384,21 +377,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/smaugworld.h">
+    <entry file="file://$PROJECT_DIR$/cow.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="95" column="36" selection-start-line="95" selection-start-column="21" selection-end-line="95" selection-end-column="36" />
+        <state relative-caret-position="765">
+          <caret line="51" column="19" selection-start-line="51" selection-start-column="19" selection-end-line="51" selection-end-column="19" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/smaugworld.c">
+    <entry file="file://$PROJECT_DIR$/smaug.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="92" column="21" selection-start-line="92" selection-start-column="21" selection-end-line="92" selection-end-column="21" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="30">
+          <caret line="2" column="5" selection-start-line="2" selection-start-column="5" selection-end-line="2" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/smaug.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="404">
+          <caret line="47" column="12" selection-start-line="47" selection-start-column="12" selection-end-line="47" selection-end-column="12" />
+          <folding />
         </state>
       </provider>
     </entry>
