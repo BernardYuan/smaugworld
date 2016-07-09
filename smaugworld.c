@@ -16,12 +16,22 @@ int numMealFlag = 0;
 int *numMeal = NULL;
 int numEatenMealFlag = 0;
 int *numEatenMeal = NULL;
+
+//Shared Variables of Sheep
 int SheepInValleyFlag = 0;
 int *SheepInValley = NULL;
 int numSheepToEatFlag = 0;
 int *numSheepToEat = NULL;
 int numSheepEatenFlag = 0;
 int *numSheepEaten = NULL;
+
+//Shared Variables of Cow
+int CowInValleyFlag = 0;
+int *CowInValley = NULL;
+int numCowToEatFlag = 0;
+int *numCowToEat = NULL;
+int numCowEatenFlag = 0;
+int *numCowEaten = NULL;
 
 //semaphores of dragon
 //Dragon Wake up
@@ -68,9 +78,35 @@ struct sembuf SignalPSheepEaten = {SEM_P_SHEEPEATEN, 1, 0};
 struct sembuf WaitSSheepDie = {SEM_S_SHEEPDIE, -1, 0};
 struct sembuf SignalSSheepDie = {SEM_S_SHEEPDIE, 1, 0};
 
+//semaphores of Cow
+//Cow in Valley
+struct sembuf WaitNCowInValley = {SEM_N_COWINVALLEY, -1, 0};
+struct sembuf SignalNCowInValley = {SEM_N_COWINVALLEY, 1, 0};
+//protector of Cow In Valley
+struct sembuf WaitPCowInValley = {SEM_P_COWINVALLEY, -1, 0};
+struct sembuf SignalPCowInValley = {SEM_P_COWINVALLEY, 1, 0};
+//cow waiting
+struct sembuf WaitSCowWaiting = {SEM_S_COWWAITING, -1, 0};
+struct sembuf SignalSCowWaiting = {SEM_S_COWWAITING, 1, 0};
+//cow to eat
+struct sembuf WaitNCowToEat = {SEM_N_COWTOEAT, -1, 0};
+struct sembuf SignalCowToEat = {SEM_N_COWTOEAT, 1, 0};
+//protector cow to eat
+struct sembuf WaitPCowToEat = {SEM_P_COWTOEAT, -1, 0};
+struct sembuf SignalPCowToEat = {SEM_P_COWTOEAT, 1, 0};
+//cow eaten
+struct sembuf WaitSCowEaten = {SEM_S_COWEATEN, -1, 0};
+struct sembuf SignalSCowEaten = {SEM_S_COWEATEN, 1, 0};
+//protector of Cow eaten
+struct sembuf WaitPCowEaten = {SEM_P_COWEATEN, -1, 0};
+struct sembuf SignalPCowEaten = {SEM_P_COWEATEN, 1, 0};
+//cow die
+struct sembuf WaitSCowDie = {SEM_S_COWDIE, -1, 0};
+struct sembuf SignalSCowDie = {SEM_S_COWDIE, 1, 0};
+
 //function definitions
 void initialize() {
-    semID = semget(IPC_PRIVATE, 13, 0666 | IPC_CREAT);
+    semID = semget(IPC_PRIVATE, 21, 0666 | IPC_CREAT);
 
     //initialize values of semaphore
     seminfo.val = 0;
@@ -82,7 +118,11 @@ void initialize() {
     semctlChecked(semID, SEM_N_SHEEPTOEAT, SETVAL, seminfo);
     semctlChecked(semID, SEM_S_SHEEPEATEN, SETVAL, seminfo);
     semctlChecked(semID, SEM_S_SHEEPDIE, SETVAL, seminfo);
-
+    semctlChecked(semID, SEM_N_COWINVALLEY, SETVAL, seminfo);
+    semctlChecked(semID, SEM_S_COWWAITING, SETVAL, seminfo);
+    semctlChecked(semID, SEM_N_COWTOEAT, SETVAL, seminfo);
+    semctlChecked(semID, SEM_S_COWEATEN, SETVAL, seminfo);
+    semctlChecked(semID, SEM_S_COWDIE, SETVAL, seminfo);
     //initialize values of mutex
     seminfo.val = 1;
     semctlChecked(semID, SEM_P_NUMMEAL, SETVAL, seminfo);
@@ -90,7 +130,9 @@ void initialize() {
     semctlChecked(semID, SEM_P_SHEEPINVALLEY, SETVAL, seminfo);
     semctlChecked(semID, SEM_P_SHEEPTOEAT, SETVAL, seminfo);
     semctlChecked(semID, SEM_P_SHEEPEATEN, SETVAL, seminfo);
-
+    semctlChecked(semID, SEM_P_COWINVALLEY, SETVAL, seminfo);
+    semctlChecked(semID, SEM_P_COWTOEAT, SETVAL, seminfo);
+    semctlChecked(semID, SEM_P_COWEATEN, SETVAL, seminfo);
 //int  numMealFlag = 0;
 //int *numMeal = NULL;
 //int  numEatenMealFlag = 0;
@@ -103,11 +145,17 @@ void initialize() {
 //int *numSheepEaten = NULL;
 
     //allocate shared memory
+    //shared memory for meal
     shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &numMealFlag, &numMeal);
     shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &numEatenMealFlag, &numEatenMeal);
+    //shared memory for sheep
     shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &SheepInValleyFlag, &SheepInValley);
     shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &numSheepToEatFlag, &numSheepToEat);
     shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &numSheepEatenFlag, &numSheepEaten);
+    //shared memory for cow
+    shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &CowInValleyFlag, &CowInValley);
+    shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &numCowToEatFlag, &numCowToEat);
+    shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &numCowEatenFlag, &numCowEaten);
 }
 
 void semctlChecked(int semID, int semNum, int flag, union semun seminfo) {

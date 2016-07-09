@@ -1,16 +1,13 @@
 #include "sheep.h"
 
-void graze(int time) {
+void sheep(int time) {
+    pid_t localpid = getpid();
+    printf("sheep %d is grazing for %d usec\n", localpid, time);
+    //grazing
     if (usleep(time) == -1) {
         /* exit when usleep interrupted by kill signal */
         if (errno == EINTR)exit(4);
     }
-}
-
-void sheep(int time) {
-    pid_t localpid = getpid();
-    printf("sheep %d is grazing for %d usec\n", localpid, time);
-    graze(time);
     printf("sheep %d is enchanted\n", localpid);
     //the sheep is enchanted
     semopChecked(semID, &WaitPSheepInValley, 1);
@@ -22,8 +19,9 @@ void sheep(int time) {
         int i;
         for (i = 0; i < SHEEP_IN_MEAL; i++) {
             semopChecked(semID, &WaitNSheepInValley, 1);
+            *SheepInValley = *SheepInValley - 1;
         }
-        *SheepInValley = *SheepInValley - SHEEP_IN_MEAL;
+
         semopChecked(semID, &WaitPNumMeal, 1);
         *numMeal = *numMeal + 1;
         printf("A new meal is added, now number of meals:%d\n", *numMeal);

@@ -79,6 +79,39 @@ extern struct sembuf SignalPSheepEaten;
 extern struct sembuf WaitSSheepDie;
 extern struct sembuf SignalSSheepDie;
 
+//semaphores of cow
+#define SEM_N_COWINVALLEY 13
+extern struct sembuf WaitNCowInValley;
+extern struct sembuf SignalNCowInValley;
+#define SEM_P_COWINVALLEY 14
+extern int CowInValleyFlag;
+extern int *CowInValley;
+extern struct sembuf WaitPCowInValley;
+extern struct sembuf SignalPCowInValley;
+#define SEM_S_COWWAITING  15
+extern struct sembuf WaitSCowWaiting;
+extern struct sembuf SignalSCowWaiting;
+#define SEM_N_COWTOEAT    16
+extern struct sembuf WaitNCowToEat;
+extern struct sembuf SignalNCowToEat;
+#define SEM_P_COWTOEAT    17
+extern int numCowToEatFlag;
+extern int *numCowToEat;
+extern struct sembuf WaitPCowToEat;
+extern struct sembuf SignalPCowToEat;
+#define SEM_S_COWEATEN    18
+extern struct sembuf WaitSCowEaten;
+extern struct sembuf SignalSCowEaten;
+#define SEM_P_COWEATEN    19
+extern int numCowEatenFlag;
+extern int *numCowEaten;
+extern struct sembuf WaitPCowEaten;
+extern struct sembuf SignalPCowEaten;
+#define SEM_S_COWDIE    20
+extern struct sembuf WaitSCowDie;
+extern struct sembuf SignalSCowDie;
+
+
 //make variables external so that they are visible in other files
 extern int semID;
 extern union semun seminfo;
