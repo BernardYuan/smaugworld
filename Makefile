@@ -7,7 +7,7 @@ smaug.o: smaug.c smaugworld.h smaug.h
 sheep.o: sheep.c smaugworld.h sheep.h
 	gcc -c sheep.c
 cow.o: cow.c smaugworld.h cow.h
-    gcc -c cow.c
+	gcc -c cow.c
 
 clean:
 	@echo "cleaning project"
