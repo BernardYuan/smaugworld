@@ -1,7 +1,7 @@
 #include "smaugworld.h"
 #include "sheep.h"
 #include "smaug.h"
-
+#include "cow.h"
 //global variables
 int semID;
 union semun {
@@ -227,6 +227,7 @@ int main(void) {
 
         }
         int rn = random();
-        sheep(1e6 + rn % 5555);
+        if(rn%2==0) sheep(1e6 + rn % 5555);
+        else cow(1e6 + rn%6666);
     }
 }
