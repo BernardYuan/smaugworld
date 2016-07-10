@@ -15,6 +15,9 @@ struct timeval startTime;
 // shared memory of dragon
 int DragonWakeUpFlag = 0;
 int *DragonWakeUp = NULL;
+int numDragonJewelFlag = 0;
+int *numDragonJewel = NULL;
+
 //shared memory meals
 int numMealFlag = 0;
 int *numMeal = NULL;
@@ -37,6 +40,12 @@ int *numCowToEat = NULL;
 int numCowEatenFlag = 0;
 int *numCowEaten = NULL;
 
+//shared variables of Hunters
+int numHunterPathFlag = 0;
+int *numHunterPath = NULL;
+int numHunterLeaveFlag = 0;
+int numHunterLeave = NULL;
+
 //semaphores of dragon
 //Dragon Wake up
 struct sembuf WaitSDragonWakeUp = {SEM_S_DRAGONWAKEUP, -1, 0};
@@ -47,6 +56,16 @@ struct sembuf SignalSDragonEat = {SEM_S_DRAGONEAT, 1, 0};
 //protecting the shared memory of dragon wakeup
 struct sembuf WaitPDragonWakeUp = {SEM_P_DRAGONWAKEUP, -1, 0};
 struct sembuf SignalPDragonWakeUp = {SEM_P_DRAGONWAKEUP, 1, 0};
+//protecting number of jewels dragon has
+struct sembuf WaitPDragonJewel = {SEM_P_DRAGONJEWEL, -1, 0};
+struct sembuf SignalPDragonJewel = {SEM_P_DRAGONJEWEL, 1, 0};
+//Dragon Fight
+struct sembuf WaitSDragonFight = {SEM_S_DRAGONFIGHT, -1, 0};
+struct sembuf SignalSDragonFight = {SEM_S_DRAGONFIGHT, 1, 0};
+//Dragon Play
+struct sembuf WaitSDragonPlay = {SEM_S_DRAGONPLAY, -1, 0};
+struct sembuf SignalSDragonPlay = {SEM_S_DRAGONPLAY, 1, 0};
+
 //semaphores of meal
 //number of meals
 struct sembuf WaitNMeal = {SEM_N_MEAL, -1, 0};
@@ -110,9 +129,47 @@ struct sembuf SignalPCowEaten = {SEM_P_COWEATEN, 1, 0};
 struct sembuf WaitSCowDie = {SEM_S_COWDIE, -1, 0};
 struct sembuf SignalSCowDie = {SEM_S_COWDIE, 1, 0};
 
+//semaphores of hunters
+//hunters in the path
+struct sembuf WaitNHunterPath = {SEM_N_HUNTERPATH, -1, 0};
+struct sembuf SignalNHunterPath = {SEM_N_HUNTERPATH, 1, 0};
+//protecting the memory of hunters in path
+struct sembuf WaitPHunterPath = {SEM_P_HUNTERPATH, -1, 0};
+struct sembuf SignalPHunterPath = {SEM_P_HUNTERPATH, 1, 0};
+//hunters entering the cave
+struct sembuf WaitSHunterCave = {SEM_S_HUNTERCAVE, -1, 0};
+struct sembuf SignalSHunterCave = {SEM_S_HUNTERCAVE, 1, 0};
+// hunters fighting
+struct sembuf WaitSHunterFight = {SEM_S_HUNTERFIGHT, -1, 0};
+struct sembuf SignalSHunterFight = {SEM_S_HUNTERFIGHT, 1, 0};
+//hunter leaving the Cave
+struct sembuf WaitingSHunterLeave = {SEM_S_HUNTERLEAVE, -1, 0};
+struct sembuf SignalSHunterLeave = {SEM_S_HUNTERLEAVE, 1, 0};
+//counter of hunters dealt by smaug
+struct sembuf WaitPHunterLeave = {SEM_P_HUNTERLEAVE, -1, 0};
+struct sembuf SignalPHunterLeave = {SEM_P_HUNTERLEAVE, 1, 0};
+
+//semaphore operations of thieves
+struct sembuf WaitNThiefPath = {SEM_N_THIEFPATH, -1, 0};
+struct sembuf SignalNThiefPath = {SEM_N_THIEFPATH, 1, 0};
+
+struct sembuf WaitPThiefPath = {SEM_P_THIEFPATH, -1, 0};
+struct sembuf SignalPThiefPath = {SEM_P_THIEFPATH, 1, 0};
+
+struct sembuf WaitSThiefCave = {SEM_S_THIEFCAVE, -1, 0};
+struct sembuf SignalSThiefCave = {SEM_S_THIEFCAVE, 1, 0};
+
+struct sembuf WaitSThiefPlay = {SEM_S_THIEFPLAY, -1, 0};
+struct sembuf SignalSThiefPlay = {SEM_S_THIEFPLAY, 1, 0};
+
+struct sembuf WaitSThiefLeave = {SEM_S_THIEFLEAVE, -1, 0};
+struct sembuf SignalSThiefLeave = {SEM_S_THIEFLEAVE, 1, 0};
+
+struct sembuf WaitPThiefLeave = {SEM_P_THIEFLEAVE, -1, 0};
+struct sembuf SignalPThiefLeave = {SEM_P_THIEFLEAVE, 1, 0};
 //function definitions
 void initialize() {
-    semID = semget(IPC_PRIVATE, 22, 0666 | IPC_CREAT);
+    semID = semget(IPC_PRIVATE, 23, 0666 | IPC_CREAT);
 
     //initialize values of semaphore
     seminfo.val = 0;
@@ -129,6 +186,8 @@ void initialize() {
     semctlChecked(semID, SEM_N_COWTOEAT, SETVAL, seminfo);
     semctlChecked(semID, SEM_S_COWEATEN, SETVAL, seminfo);
     semctlChecked(semID, SEM_S_COWDIE, SETVAL, seminfo);
+    semctlChecked(semID, SEM_S_DRAGONFIGHT, SETVAL, seminfo);
+
     //initialize values of mutex
     seminfo.val = 1;
     semctlChecked(semID, SEM_P_NUMMEAL, SETVAL, seminfo);
@@ -140,6 +199,7 @@ void initialize() {
     semctlChecked(semID, SEM_P_COWTOEAT, SETVAL, seminfo);
     semctlChecked(semID, SEM_P_COWEATEN, SETVAL, seminfo);
     semctlChecked(semID, SEM_P_DRAGONWAKEUP, SETVAL, seminfo);
+    semctlChecked(semID, SEM_P_DRAGONJEWEL, SETVAL, seminfo);
 //int  numMealFlag = 0;
 //int *numMeal = NULL;
 //int  numEatenMealFlag = 0;
@@ -154,6 +214,7 @@ void initialize() {
     //allocate shared memory
     //shared memory for dragon
     shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &DragonWakeUpFlag, &DragonWakeUp);
+    shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &numDragonJewelFlag, &numDragonJewel);
     //shared memory for meal
     shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &numMealFlag, &numMeal);
     shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &numEatenMealFlag, &numEatenMeal);
@@ -231,7 +292,7 @@ int main(void) {
             if (r == 0) break;
             else {
                 int pr = random();
-                usleep(pr % 5555 + 1e6);
+                usleep(pr % 5555 + 5e5);
             }
 
         }

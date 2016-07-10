@@ -1,10 +1,5 @@
 #include "cow.h"
-void swim() {
-    if (usleep(1e6) == -1) {
-        /* exit when usleep interrupted by kill signal */
-        if (errno == EINTR)exit(4);
-    }
-}
+
 void cow(int time) {
     pid_t localpid = getpid();
     printf("cow %d is grazing for %d usec\n", localpid, time);
