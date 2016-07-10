@@ -55,6 +55,10 @@ int *numThiefPath = NULL;
 int numThiefLeaveFlag = 0;
 int *numThiefLeave = NULL;
 
+//shared variable of the system
+int flagTerminationFlag = 0;
+int *flagTermination = NULL;
+
 //semaphores of dragon
 //Dragon Wake up
 struct sembuf WaitSDragonWakeUp = {SEM_S_DRAGONWAKEUP, -1, 0};
@@ -159,24 +163,28 @@ struct sembuf WaitPHunterLeave = {SEM_P_HUNTERLEAVE, -1, 0};
 struct sembuf SignalPHunterLeave = {SEM_P_HUNTERLEAVE, 1, 0};
 
 //semaphore operations of thieves
+//counter of thieves in the path
 struct sembuf WaitNThiefPath = {SEM_N_THIEFPATH, -1, 0};
 struct sembuf SignalNThiefPath = {SEM_N_THIEFPATH, 1, 0};
-
+//protector of number of thieves in the path
 struct sembuf WaitPThiefPath = {SEM_P_THIEFPATH, -1, 0};
 struct sembuf SignalPThiefPath = {SEM_P_THIEFPATH, 1, 0};
-
+//Thief enters the cave
 struct sembuf WaitSThiefCave = {SEM_S_THIEFCAVE, -1, 0};
 struct sembuf SignalSThiefCave = {SEM_S_THIEFCAVE, 1, 0};
-
+//Thief plays with smaug
 struct sembuf WaitSThiefPlay = {SEM_S_THIEFPLAY, -1, 0};
 struct sembuf SignalSThiefPlay = {SEM_S_THIEFPLAY, 1, 0};
-
+//Thief leaves
 struct sembuf WaitSThiefLeave = {SEM_S_THIEFLEAVE, -1, 0};
 struct sembuf SignalSThiefLeave = {SEM_S_THIEFLEAVE, 1, 0};
-
+//protector of number of left thief
 struct sembuf WaitPThiefLeave = {SEM_P_THIEFLEAVE, -1, 0};
 struct sembuf SignalPThiefLeave = {SEM_P_THIEFLEAVE, 1, 0};
 
+//semaphores of system
+struct sembuf WaitPTermination = {SEM_P_TERMINATION, -1, 0};
+struct sembuf SignalPTermination = {SEM_P_TERMINATION, 1, 0};
 //function definitions
 void initialize() {
     semID = semget(IPC_PRIVATE, 36, 0666 | IPC_CREAT);
@@ -234,7 +242,7 @@ void initialize() {
     semctlChecked(semID, SEM_P_HUNTERPATH, SETVAL, seminfo);
     semctlChecked(semID, SEM_P_HUNTERLEAVE, SETVAL, seminfo);
 
-    //semaphores of
+    //semaphores of thieves
     seminfo.val = 0;
     semctlChecked(semID, SEM_N_THIEFPATH, SETVAL, seminfo);
     semctlChecked(semID, SEM_S_THIEFCAVE, SETVAL, seminfo);
@@ -243,6 +251,10 @@ void initialize() {
     seminfo.val = 1;
     semctlChecked(semID, SEM_P_THIEFPATH, SETVAL, seminfo);
     semctlChecked(semID, SEM_P_THIEFLEAVE, SETVAL, seminfo);
+
+    //semaphores of the system
+    seminfo.val = 1;
+    semctlChecked(semID, SEM_P_TERMINATION, SETVAL, seminfo);
 
     //allocate shared memory
     //shared memory for dragon
@@ -265,6 +277,8 @@ void initialize() {
     //shared memory for thief
     shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &numThiefPathFlag, &numThiefPath);
     shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &numThiefLeaveFlag, &numThiefLeave);
+    //shared memory for the system
+    shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &flagTerminationFlag, &flagTermination);
 }
 
 void semctlChecked(int semID, int semNum, int flag, union semun seminfo) {

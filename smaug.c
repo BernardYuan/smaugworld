@@ -132,6 +132,40 @@ void smaug() {
     while (1) {
         printf("Smaug is awake\n");
 
+        //!!! keep in this order to avoid deadlock
+        //acquire the control of variables
+        semopChecked(semID, &WaitPNumMeal, 1);
+        semopChecked(semID, &WaitPThiefPath, 1);
+        semopChecked(semID, &WaitPHunterPath, 1);
+        while(*numMeal > 0 || *numThiefPath > 0 || *numHunterPath > 0) {
+            // close the control of shared variables
+            semopChecked(semID, &SignalPHunterPath, 1);
+            semopChecked(semID, &SignalPThiefPath, 1);
+            semopChecked(semID, &SignalPNumMeal, 1);
+
+
+
+
+
+
+            //acquire control of shared variables
+            semopChecked(semID, &WaitPNumMeal, 1);
+            semopChecked(semID, &WaitPThiefPath, 1);
+            semopChecked(semID, &WaitPHunterPath, 1);
+        }
+        //release control of the shared variables
+        semopChecked(semID, &SignalPHunterPath, 1);
+        semopChecked(semID, &SignalPThiefPath, 1);
+        semopChecked(semID, &SignalPNumMeal, 1);
+
+        semopChecked(semID, &WaitPTermination, 1);
+        if(*flagTermination == 1) {
+            semopChecked(semID, &SignalPTermination, 1);
+            break;
+        }
+        else {
+            semopChecked(semID, &SignalPTermination, 1);
+        }
 
         // the dragon is about to fall in sleep
         semopChecked(semID, &WaitPDragonWakeUp, 1);
@@ -140,4 +174,5 @@ void smaug() {
         printf("Smaug goes to sleep\n");
         semopChecked(semID, &WaitSDragonWakeUp, 1);
     }
+    exit(0);
 }

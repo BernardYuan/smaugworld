@@ -174,6 +174,12 @@ extern int numThiefLeaveFlag;
 extern int *numThiefLeave;
 extern struct sembuf WaitPThiefLeave;
 extern struct sembuf SignalPThiefLeave;
+// semaphores of this system
+#define SEM_P_TERMINATION 36
+extern int flagTerminationFlag;
+extern int *flagTermination;
+extern struct sembuf WaitPTermination;
+extern struct sembuf SignalPTermination;
 
 //make variables external so that they are visible in other files
 extern int semID;
