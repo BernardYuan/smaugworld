@@ -152,7 +152,7 @@ struct sembuf SignalSHunterCave = {SEM_S_HUNTERCAVE, 1, 0};
 struct sembuf WaitSHunterFight = {SEM_S_HUNTERFIGHT, -1, 0};
 struct sembuf SignalSHunterFight = {SEM_S_HUNTERFIGHT, 1, 0};
 //hunter leaving the Cave
-struct sembuf WaitingSHunterLeave = {SEM_S_HUNTERLEAVE, -1, 0};
+struct sembuf WaitSHunterLeave = {SEM_S_HUNTERLEAVE, -1, 0};
 struct sembuf SignalSHunterLeave = {SEM_S_HUNTERLEAVE, 1, 0};
 //counter of hunters dealt by smaug
 struct sembuf WaitPHunterLeave = {SEM_P_HUNTERLEAVE, -1, 0};

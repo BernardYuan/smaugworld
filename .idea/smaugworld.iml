@@ -9,14 +9,14 @@
       <sourceFolder url="file://$MODULE_DIR$/sheep.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Makefile" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/thief.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/thief.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/cow.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/smaugworld.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/smaugworld.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/hunter.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/cleanSem.sh" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/thief.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/smaugworld.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/smaug.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/thief.c" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
