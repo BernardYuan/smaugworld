@@ -2,6 +2,9 @@
 #include "sheep.h"
 #include "smaug.h"
 #include "cow.h"
+#include "hunter.h"
+#include "thief.h"
+
 //global variables
 int semID;
 union semun {
@@ -44,7 +47,13 @@ int *numCowEaten = NULL;
 int numHunterPathFlag = 0;
 int *numHunterPath = NULL;
 int numHunterLeaveFlag = 0;
-int numHunterLeave = NULL;
+int *numHunterLeave = NULL;
+
+//shared variable of thieves
+int numThiefPathFlag = 0;
+int *numThiefPath = NULL;
+int numThiefLeaveFlag = 0;
+int *numThiefLeave = NULL;
 
 //semaphores of dragon
 //Dragon Wake up
@@ -53,7 +62,7 @@ struct sembuf SignalSDragonWakeUp = {SEM_S_DRAGONWAKEUP, 1, 0};
 //Dragon Eat
 struct sembuf WaitSDragonEat = {SEM_S_DRAGONEAT, -1, 0};
 struct sembuf SignalSDragonEat = {SEM_S_DRAGONEAT, 1, 0};
-//protecting the shared memory of dragon wakeup
+//protecting the shared memory of dragon wakeup flag
 struct sembuf WaitPDragonWakeUp = {SEM_P_DRAGONWAKEUP, -1, 0};
 struct sembuf SignalPDragonWakeUp = {SEM_P_DRAGONWAKEUP, 1, 0};
 //protecting number of jewels dragon has
@@ -167,49 +176,73 @@ struct sembuf SignalSThiefLeave = {SEM_S_THIEFLEAVE, 1, 0};
 
 struct sembuf WaitPThiefLeave = {SEM_P_THIEFLEAVE, -1, 0};
 struct sembuf SignalPThiefLeave = {SEM_P_THIEFLEAVE, 1, 0};
+
 //function definitions
 void initialize() {
-    semID = semget(IPC_PRIVATE, 23, 0666 | IPC_CREAT);
+    semID = semget(IPC_PRIVATE, 36, 0666 | IPC_CREAT);
+
 
     //initialize values of semaphore
+    //semaphores of Dragon
     seminfo.val = 0;
     semctlChecked(semID, SEM_S_DRAGONWAKEUP, SETVAL, seminfo);
     semctlChecked(semID, SEM_S_DRAGONEAT, SETVAL, seminfo);
+    semctlChecked(semID, SEM_S_DRAGONFIGHT, SETVAL, seminfo);
+    semctlChecked(semID, SEM_S_DRAGONPLAY, SETVAL, seminfo);
+    seminfo.val = 1;
+    semctlChecked(semID, SEM_P_DRAGONWAKEUP, SETVAL, seminfo);
+    semctlChecked(semID, SEM_P_DRAGONJEWEL, SETVAL, seminfo);
+
+    //semaphores of meals
+    seminfo.val = 0;
     semctlChecked(semID, SEM_N_MEAL, SETVAL, seminfo);
+    seminfo.val = 1;
+    semctlChecked(semID, SEM_P_NUMMEAL, SETVAL, seminfo);
+    semctlChecked(semID, SEM_P_EATENMEAL, SETVAL, seminfo);
+
+    //semaphores of sheep
+    seminfo.val = 0;
     semctlChecked(semID, SEM_N_SHEEPINVALLEY, SETVAL, seminfo);
     semctlChecked(semID, SEM_S_SHEEPWAITING, SETVAL, seminfo);
     semctlChecked(semID, SEM_N_SHEEPTOEAT, SETVAL, seminfo);
     semctlChecked(semID, SEM_S_SHEEPEATEN, SETVAL, seminfo);
     semctlChecked(semID, SEM_S_SHEEPDIE, SETVAL, seminfo);
+    seminfo.val = 1;
+    semctlChecked(semID, SEM_P_SHEEPINVALLEY, SETVAL, seminfo);
+    semctlChecked(semID, SEM_P_SHEEPTOEAT, SETVAL, seminfo);
+    semctlChecked(semID, SEM_P_SHEEPEATEN, SETVAL, seminfo);
+
+    //semaphores of cows
+    seminfo.val = 0;
     semctlChecked(semID, SEM_N_COWINVALLEY, SETVAL, seminfo);
     semctlChecked(semID, SEM_S_COWWAITING, SETVAL, seminfo);
     semctlChecked(semID, SEM_N_COWTOEAT, SETVAL, seminfo);
     semctlChecked(semID, SEM_S_COWEATEN, SETVAL, seminfo);
     semctlChecked(semID, SEM_S_COWDIE, SETVAL, seminfo);
-    semctlChecked(semID, SEM_S_DRAGONFIGHT, SETVAL, seminfo);
-
-    //initialize values of mutex
     seminfo.val = 1;
-    semctlChecked(semID, SEM_P_NUMMEAL, SETVAL, seminfo);
-    semctlChecked(semID, SEM_P_EATENMEAL, SETVAL, seminfo);
-    semctlChecked(semID, SEM_P_SHEEPINVALLEY, SETVAL, seminfo);
-    semctlChecked(semID, SEM_P_SHEEPTOEAT, SETVAL, seminfo);
-    semctlChecked(semID, SEM_P_SHEEPEATEN, SETVAL, seminfo);
     semctlChecked(semID, SEM_P_COWINVALLEY, SETVAL, seminfo);
     semctlChecked(semID, SEM_P_COWTOEAT, SETVAL, seminfo);
     semctlChecked(semID, SEM_P_COWEATEN, SETVAL, seminfo);
-    semctlChecked(semID, SEM_P_DRAGONWAKEUP, SETVAL, seminfo);
-    semctlChecked(semID, SEM_P_DRAGONJEWEL, SETVAL, seminfo);
-//int  numMealFlag = 0;
-//int *numMeal = NULL;
-//int  numEatenMealFlag = 0;
-//int *numEatenMeal = NULL;
-//int  SheepInValleyFlag = 0;
-//int *SheepInValley = NULL;
-//int  numSheepToEatFlag = 0;
-//int *numSheepToEat = NULL;
-//int  numSheepEatenFlag = 0;
-//int *numSheepEaten = NULL;
+
+    //semaphores of hunters
+    seminfo.val = 0;
+    semctlChecked(semID, SEM_N_HUNTERPATH, SETVAL, seminfo);
+    semctlChecked(semID, SEM_S_HUNTERCAVE, SETVAL, seminfo);
+    semctlChecked(semID, SEM_S_HUNTERFIGHT, SETVAL, seminfo);
+    semctlChecked(semID, SEM_S_HUNTERLEAVE, SETVAL, seminfo);
+    seminfo.val = 1;
+    semctlChecked(semID, SEM_P_HUNTERPATH, SETVAL, seminfo);
+    semctlChecked(semID, SEM_P_HUNTERLEAVE, SETVAL, seminfo);
+
+    //semaphores of
+    seminfo.val = 0;
+    semctlChecked(semID, SEM_N_THIEFPATH, SETVAL, seminfo);
+    semctlChecked(semID, SEM_S_THIEFCAVE, SETVAL, seminfo);
+    semctlChecked(semID, SEM_S_THIEFPLAY, SETVAL, seminfo);
+    semctlChecked(semID, SEM_S_THIEFLEAVE, SETVAL, seminfo);
+    seminfo.val = 1;
+    semctlChecked(semID, SEM_P_THIEFPATH, SETVAL, seminfo);
+    semctlChecked(semID, SEM_P_THIEFLEAVE, SETVAL, seminfo);
 
     //allocate shared memory
     //shared memory for dragon
@@ -226,6 +259,12 @@ void initialize() {
     shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &CowInValleyFlag, &CowInValley);
     shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &numCowToEatFlag, &numCowToEat);
     shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &numCowEatenFlag, &numCowEaten);
+    //shared memory for hunter
+    shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &numHunterPathFlag, &numHunterPath);
+    shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &numHunterLeaveFlag, &numHunterLeave);
+    //shared memory for thief
+    shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &numThiefPathFlag, &numThiefPath);
+    shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &numThiefLeaveFlag, &numThiefLeave);
 }
 
 void semctlChecked(int semID, int semNum, int flag, union semun seminfo) {
@@ -297,7 +336,9 @@ int main(void) {
 
         }
         int rn = random();
-        if(rn%2==0) sheep(1e6 + rn % 5555);
-        else cow(1e6 + rn%6666);
+        if (rn % 4 == 0) sheep(1e6 + rn % 5555);
+        else if (rn % 4 == 1) cow(1e6 + rn % 6666);
+        else if (rn % 4 == 2) hunter();
+        else if (rn % 4 == 3) thief();
     }
 }

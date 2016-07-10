@@ -60,6 +60,7 @@ void fight() {
         semopChecked(semID, &WaitNHunterPath, 1);
         printf("Smaug is ready to interact with a hunter waiting in the path");
         semopChecked(semID, &SignalSHunterCave, 1);
+
     }
     semopChecked(semID, &SignalPHunterPath, 1);
     semopChecked(semID, &WaitSDragonFight, 1);
