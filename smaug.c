@@ -5,6 +5,11 @@ void smaug() {
     localid = getpid();
     printf("ProcessID of smaug:%d\n", localid);
     printf("Smaug is sleeping\n");
+
+    semopChecked(semID, &WaitPDragonWakeUp, 1);
+    *DragonWakeUp = 0;
+    semopChecked(semID, &SignalPDragonWakeUp, 1);
+
     semopChecked(semID, &WaitSDragonWakeUp, 1);
     int time = 0;
     while (1) {
@@ -51,7 +56,11 @@ void smaug() {
         }
         semopChecked(semID, &SignalPNumMeal, 1);
 
+        // the dragon is about to fall in sleep
+        semopChecked(semID, &WaitPDragonWakeUp, 1);
+        *DragonWakeUp = 0;
+        semopChecked(semID, &SignalPDragonWakeUp, 1);
+
         semopChecked(semID, &WaitSDragonWakeUp, 1);
     }
 }
-

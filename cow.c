@@ -37,8 +37,14 @@ void cow(int time) {
 
         semopChecked(semID, &SignalPCowInValley, 1);
         semopChecked(semID, &SignalPSheepInValley, 1);
-        printf("The last cow %d in the meal wakes up the dragon\n", localpid);
-        semopChecked(semID, &SignalSDragonWakeUp, 1);
+
+        semopChecked(semID, &WaitPDragonWakeUp, 1);
+        if(*DragonWakeUp == 0) {
+            *DragonWakeUp = 1; //assign 1 means the dragon is waken up once now
+            semopChecked(semID, &SignalSDragonWakeUp, 1);
+            printf("The last cow %d in the meal wakes up the dragon\n", localpid);
+        }
+        semopChecked(semID, &SignalPDragonWakeUp, 1);
     }
     else { //the cow in the Valley is not enough for a meal
         semopChecked(semID, &SignalPCowInValley, 1);
