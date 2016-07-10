@@ -9,9 +9,9 @@ sheep.o: sheep.c smaugworld.h sheep.h
 cow.o: cow.c smaugworld.h cow.h
 	gcc -c cow.c
 hunter.o: hunter.c smaugworld.h hunter.h
-    gcc -c hunter.c
+	gcc -c hunter.c
 thief.o: thief.c smaugworld.h thief.h
-    gcc -c thief.c
+	gcc -c thief.c
 
 clean:
 	@echo "cleaning project"
