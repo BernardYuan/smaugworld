@@ -139,6 +139,7 @@ void initialize() {
     semctlChecked(semID, SEM_P_COWINVALLEY, SETVAL, seminfo);
     semctlChecked(semID, SEM_P_COWTOEAT, SETVAL, seminfo);
     semctlChecked(semID, SEM_P_COWEATEN, SETVAL, seminfo);
+    semctlChecked(semID, SEM_P_DRAGONWAKEUP, SETVAL, seminfo);
 //int  numMealFlag = 0;
 //int *numMeal = NULL;
 //int  numEatenMealFlag = 0;
