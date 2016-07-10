@@ -12,6 +12,10 @@ union semun {
 struct timeval startTime;
 
 //pointers to shared memory
+// shared memory of dragon
+int DragonWakeUpFlag = 0;
+int *DragonWakeUp = NULL;
+//shared memory meals
 int numMealFlag = 0;
 int *numMeal = NULL;
 int numEatenMealFlag = 0;
@@ -40,7 +44,9 @@ struct sembuf SignalSDragonWakeUp = {SEM_S_DRAGONWAKEUP, 1, 0};
 //Dragon Eat
 struct sembuf WaitSDragonEat = {SEM_S_DRAGONEAT, -1, 0};
 struct sembuf SignalSDragonEat = {SEM_S_DRAGONEAT, 1, 0};
-
+//protecting the shared memory of dragon wakeup
+struct sembuf WaitPDragonWakeUp = {SEM_P_DRAGONWAKEUP, -1, 0};
+struct sembuf SignalPDragonWakeUp = {SEM_P_DRAGONWAKEUP, 1, 0};
 //semaphores of meal
 //number of meals
 struct sembuf WaitNMeal = {SEM_N_MEAL, -1, 0};
@@ -106,7 +112,7 @@ struct sembuf SignalSCowDie = {SEM_S_COWDIE, 1, 0};
 
 //function definitions
 void initialize() {
-    semID = semget(IPC_PRIVATE, 21, 0666 | IPC_CREAT);
+    semID = semget(IPC_PRIVATE, 22, 0666 | IPC_CREAT);
 
     //initialize values of semaphore
     seminfo.val = 0;
@@ -145,6 +151,8 @@ void initialize() {
 //int *numSheepEaten = NULL;
 
     //allocate shared memory
+    //shared memory for dragon
+    shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &DragonWakeUpFlag, &DragonWakeUp);
     //shared memory for meal
     shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &numMealFlag, &numMeal);
     shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &numEatenMealFlag, &numEatenMeal);
