@@ -1,5 +1,10 @@
 #include "cow.h"
-
+void swim() {
+    if (usleep(1e6) == -1) {
+        /* exit when usleep interrupted by kill signal */
+        if (errno == EINTR)exit(4);
+    }
+}
 void cow(int time) {
     pid_t localpid = getpid();
     printf("cow %d is grazing for %d usec\n", localpid, time);
@@ -51,7 +56,7 @@ void cow(int time) {
         semopChecked(semID, &SignalPSheepInValley, 1);
     }
 
-    printf("Cow %d waiting in the snack\n", localpid);
+//    printf("Cow %d waiting in the snack\n", localpid);
     semopChecked(semID, &WaitSCowWaiting, 1);
 
     semopChecked(semID, &SignalNCowToEat, 1);

@@ -49,7 +49,7 @@ void sheep(int time) {
         semopChecked(semID, &SignalPSheepInValley, 1);
     }
 
-    printf("Sheep %d waiting in the snack\n", localpid);
+//    printf("Sheep %d waiting in the snack\n", localpid);
     semopChecked(semID, &WaitSSheepWaiting, 1);
 
     semopChecked(semID, &SignalNSheepToEat, 1);
