@@ -15,10 +15,12 @@
 #include <sys/resource.h> 
 
 //termination condition
-#define MAX_COWSHEEP 14
+#define MAX_COW 14
+#define MAX_SHEEP 14
 #define MAX_TREASUREHUNTER 12
 #define MAX_THIEF 15
 #define MAX_JEWEL 800
+#define MIN_JEWEL 0
 
 //# of sheep and cows in one meal
 #define SHEEP_IN_MEAL 2
@@ -195,3 +197,5 @@ void semctlChecked(int semID, int semNum, int flag, union semun seminfo);
 void semopChecked(int semID, struct sembuf *operation, unsigned num);
 
 void shmAllocate(key_t key, size_t size, int shmflg1, const void *shmaddr, int shmflg2, int *flag, int **addr);
+
+int checkTermination();

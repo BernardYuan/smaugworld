@@ -326,6 +326,19 @@ void shmAllocate(key_t key, size_t size, int shmflg1, const void *shmaddr, int s
     }
 }
 
+int checkTermination() {
+    semopChecked(semID, &WaitPTermination, 1);
+    if (*flagTermination == 1) {
+        semopChecked(semID, &SignalPTermination, 1);
+        semopChecked(semID, &SignalPTermination, 1);
+        return 1;
+    }
+    else {
+        semopChecked(semID, &SignalPTermination, 1);
+        return 0;
+    }
+}
+
 int main(void) {
     initialize();
     pid_t result = fork();
@@ -341,6 +354,9 @@ int main(void) {
     else {
         pid_t r;
         while (1) {
+            if(checkTermination()) {
+                printf("The parent process starts terminating the simulation\n");
+            }
             r = fork();
             if (r == 0) break;
             else {
