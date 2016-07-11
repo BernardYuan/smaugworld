@@ -13,6 +13,6 @@ set(SOURCE_FILES
     smaug.c
     smaug.h
     smaugworld.c
-    smaugworld.h hunter.c hunter.h thief.c thief.h)
+    smaugworld.h hunter.c hunter.h thief.c thief.h B/smaugworld.c)
 
 add_executable(smaugworld ${SOURCE_FILES})
