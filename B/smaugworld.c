@@ -1,20 +1,8 @@
 //
 // Created by Bernard Yuan on 2016-07-11.
 //
+#include "smaugworld.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <time.h>
-#include <assert.h>
-#include <pthread.h>
-#include <semaphore.h>
-
-#define MAX_SHEEP 14
-#define MAX_COW 14
-
-#define SHEEP_IN_MEAL 2
-#define COW_IN_MEAL 2
 //global variables
 int numMeal;
 int numSheepInValley;
@@ -36,11 +24,9 @@ sem_t mtxNumMeal;
 //sheep
 sem_t semNSheepInValley;
 sem_t mtxNumSheepInValley;
-
 sem_t semSSheepWaiting;
 sem_t semNSheepWaiting;
 sem_t mtxNumSheepWaiting;
-
 sem_t semSSheepEaten;
 sem_t mtxNumSheepEaten;
 sem_t semSSheepDie;
@@ -48,11 +34,9 @@ sem_t semSSheepDie;
 //cows
 sem_t semNCowInValley;
 sem_t mtxNumCowInValley;
-
 sem_t semSCowWaiting;
 sem_t semNCowWaiting;
 sem_t mtxNumCowWaiting;
-
 sem_t semSCowEaten;
 sem_t mtxNumCowEaten;
 sem_t semSCowDie;
@@ -92,47 +76,6 @@ void initialize() {
     printf("initialization finished\n");
 }
 
-void eat() {
-    sem_wait(&semNMeal);
-    numMeal = numMeal - 1;
-
-    int i;
-    for (i = 0; i < SHEEP_IN_MEAL; i++) {
-        sem_post(&semSSheepWaiting);
-
-    }
-    for (i = 0; i < COW_IN_MEAL; i++) {
-        sem_post(&semSCowWaiting);
-    }
-    sem_wait(&semSDragonEat);
-    printf("Smaug starts eating\n");
-
-    //keep in this order to avoid deadlock
-    sem_wait(&mtxNumSheepEaten);
-    sem_wait(&mtxNumCowEaten);
-    for (i = 0; i < SHEEP_IN_MEAL; i++) {
-        sem_post(&semSSheepEaten);
-        sem_wait(&semSSheepDie);
-        numSheepEaten++;
-        printf("Smaug eats another sheep, now %d sheep eaten\n", numSheepEaten);
-    }
-
-    for (i = 0; i < COW_IN_MEAL; i++) {
-        sem_post(&semSCowEaten);
-        sem_wait(&semSCowDie);
-        numCowEaten++;
-        printf("Smaug eats another cow, now %d cows eaten\n", numCowEaten);
-    }
-    sem_post(&mtxNumCowEaten);
-    sem_post(&mtxNumSheepEaten);
-}
-
-void swim() {
-    printf("Smaug starts swimming\n");
-    usleep(1e6);
-    printf("Smaug finishes swimming\n");
-}
-
 int checkSheep() {
     sem_wait(&mtxNumSheepEaten);
     if(numSheepEaten >= MAX_SHEEP) {
@@ -161,170 +104,6 @@ int checkCow() {
         sem_post(&mtxNumCowEaten);
         return 0;
     }
-}
-
-void *smaug() {
-    printf("Smaug sleeps\n");
-    sem_wait(&semSDragonSleep);
-    while (1) {  //sleeping loop
-        printf("Smaug wakes up\n");
-        while (1) { //swimming loop
-            sem_wait(&mtxNumMeal);
-            if (numMeal > 0) {
-                printf("Smaug finds a meal\n");
-                eat();
-                sem_post(&mtxNumMeal);
-                if(checkSheep() || checkCow()) {
-                    break;
-                }
-                sem_wait(&mtxNumMeal);
-                if (numMeal > 0) {
-                    printf("Smaug finds the second meal\n");
-                    eat();
-                    sem_post(&mtxNumMeal);
-                    if(checkSheep() || checkCow()) {
-                        break;
-                    }
-                }
-                else {
-                    printf("There is no second meal, smaug goes to swim");
-                    sem_post(&mtxNumMeal);
-                    break;
-                }
-            }
-            else {
-                printf("Smaug finds no meal\n");
-                sem_post(&mtxNumMeal);
-                break;
-            }
-            swim();
-        }
-
-        if(checkTerminate()) break;
-        sem_wait(&semSDragonSleep);
-    }0
-    pthread_exit();
-}
-
-void *sheep(int time) {
-    usleep(time);
-    // get the control of two shared variables
-    // !!! always keep in this order, to avoid deadlock
-    sem_wait(&mtxNumSheepInValley);
-    sem_wait(&mtxNumCowInValley);
-
-    numSheepInValley += 1;
-    sem_post(&semNSheepInValley);
-
-    if (numSheepInValley >= SHEEP_IN_MEAL && numCowInValley > COW_IN_MEAL) {
-        int i;
-        for (i = 0; i < SHEEP_IN_MEAL; i++) {
-            sem_wait(&semNSheepInValley);
-            numSheepInValley -= 1;
-        }
-        for (i = 0; i < COW_IN_MEAL; i++) {
-            sem_wait(&semNCowInValley);
-            numCowInValley -= 1;
-        }
-
-        sem_wait(&mtxNumMeal);
-        sem_post(&semNMeal);
-        numMeal += 1;
-        printf("A new meal is added, now there are %d meals\n", numMeal);
-        sem_post(&mtxNumMeal);
-        sem_post(&semSDragonSleep);
-    }
-    //release two shared variables
-    sem_post(&mtxNumCowInValley);
-    sem_post(&mtxNumSheepInValley);
-
-    sem_wait(&semSSheepWaiting);
-
-    sem_post(&semNSheepWaiting);
-
-    //checking whether all beasts are ready to be eaten
-    sem_wait(&mtxNumSheepWaiting);
-    sem_wait(&mtxNumCowWaiting);
-    numSheepWaiting++;
-    if (numSheepWaiting >= SHEEP_IN_MEAL && numCowWaiting >= COW_IN_MEAL) {
-        int i;
-        for (i = 0; i < SHEEP_IN_MEAL; i++) {
-            sem_wait(&semNSheepWaiting);
-            numSheepWaiting--;
-        }
-        for (i = 0; i < COW_IN_MEAL; i++) {
-            sum_wait(&semNCowWaiting);
-            numCowWaiting--;
-        }
-        printf("The last sheep in the snack is ready. Smaug will eat\n");
-        sem_post(&semSDragonEat);
-    }
-    sem_post(&mtxNumCowWaiting);
-    sem_post(&mtxNumSheepWaiting);
-
-    sem_wait(&semSSheepEaten);
-    printf("A sheep is dead");
-    sem_post(&semSSheepDie);
-}
-
-void *cow(int time) {
-    usleep(time);
-    // get the control of two shared variables
-    // !!! always keep in this order, to avoid deadlock
-    sem_wait(&mtxNumSheepInValley);
-    sem_wait(&mtxNumCowInValley);
-
-    numCowInValley += 1;
-    sem_post(&semNCowInValley);
-
-    if (numSheepInValley >= SHEEP_IN_MEAL && numCowInValley > COW_IN_MEAL) {
-        int i;
-        for (i = 0; i < SHEEP_IN_MEAL; i++) {
-            sem_wait(&semNSheepInValley);
-            numSheepInValley -= 1;
-        }
-        for (i = 0; i < COW_IN_MEAL; i++) {
-            sem_wait(&semNCowInValley);
-            numCowInValley -= 1;
-        }
-
-        sem_wait(&mtxNumMeal);
-        sem_post(&semNMeal);
-        numMeal += 1;
-        printf("A new meal is added, now there are %d meals\n", numMeal);
-        sem_post(&mtxNumMeal);
-        sem_post(&semSDragonSleep);
-    }
-    //release two shared variables
-    sem_post(&mtxNumCowInValley);
-    sem_post(&mtxNumSheepInValley);
-
-    sem_wait(&semSCowWaiting);
-    sem_post(&semNCowWaiting);
-
-    //checking whether all beasts are ready to be eaten
-    sem_wait(&mtxNumSheepWaiting);
-    sem_wait(&mtxNumCowWaiting);
-    numCowWaiting++;
-    if (numSheepWaiting >= SHEEP_IN_MEAL && numCowWaiting >= COW_IN_MEAL) {
-        int i;
-        for (i = 0; i < SHEEP_IN_MEAL; i++) {
-            sem_wait(&semNSheepWaiting);
-            numSheepWaiting--;
-        }
-        for (i = 0; i < COW_IN_MEAL; i++) {
-            sum_wait(&semNCowWaiting);
-            numCowWaiting--;
-        }
-        printf("The last cow in the snack is ready. Smaug will eat\n");
-        sem_post(&semSDragonEat);
-    }
-    sem_post(&mtxNumCowWaiting);
-    sem_post(&mtxNumSheepWaiting);
-
-    sem_wait(&semSCowEaten);
-    printf("A cow is dead\n");
-    sem_post(&semSCowDie);
 }
 
 int checkTerminate() {
