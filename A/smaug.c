@@ -1,91 +1,6 @@
 #include "smaug.h"
-
-//the function which sets the termination
-void setTerminate() {
-    semopChecked(semID, &WaitPTermination, 1);
-    *flagTermination = 1;
-    semopChecked(semID, &SignalPTermination, 1);
-}
-
-int checkSheep() {
-    semopChecked(semID, &WaitPSheepEaten, 1);
-    if (*numSheepEaten >= MAX_SHEEP) {
-        printf("Smaug has eaten more than maximum number of sheep, the simulation will terminate\n");
-        setTerminate();
-        semopChecked(semID, &SignalPSheepEaten, 1);
-        return 1;
-    }
-    else {
-        semopChecked(semID, &SignalPSheepEaten, 1);
-        return 0;
-    }
-
-}
-
-int checkCow() {
-    semopChecked(semID, &WaitPCowEaten, 1);
-    if (*numCowEaten >= MAX_COW) {
-        printf("Smaug has eaten more than the maximum number of cows, the simulation will terminate\n");
-        setTerminate();
-        semopChecked(semID, &SignalPCowEaten, 1);
-        return 1;
-    }
-    else {
-        semopChecked(semID, &SignalPCowEaten, 1);
-        return 0;
-    }
-}
-
-int checkThief() {
-    semopChecked(semID, &WaitPThiefLeave, 1);
-    if (*numThiefLeave >= MAX_THIEF) {
-        printf("Smaug has played with more than maximum number of thieves, the simulation will terminate\n");
-        setTerminate();
-        semopChecked(semID, &SignalPThiefLeave, 1);
-        return 1;
-    }
-    else {
-        semopChecked(semID, &SignalPThiefLeave, 1);
-        return 0;
-    }
-}
-
-int checkHunter() {
-    semopChecked(semID, &WaitPHunterLeave, 1);
-    if (*numHunterLeave >= MAX_TREASUREHUNTER) {
-        printf("Smaug has fought with more than maximum number of hunters, the simulation will terminate\n");
-        setTerminate();
-        semopChecked(semID, &SignalPHunterLeave, 1);
-        return 1;
-    }
-    else {
-        semopChecked(semID, &SignalPHunterLeave, 1);
-        return 0;
-    }
-}
-
-int checkJewel() {
-    semopChecked(semID, &WaitPDragonJewel, 1);
-    if (*numDragonJewel >= MAX_JEWEL) {
-        printf("Dragon has more than maximum number of jewels, the simulation will terminate\n");
-        setTerminate();
-        semopChecked(semID, &SignalPDragonJewel, 1);
-        return 1;
-    }
-    else if (*numDragonJewel <= MIN_JEWEL) {
-        printf("Dragon has fewer than minimum number of jewels, the simulation will terminate\n");
-        setTerminate();
-        semopChecked(semID, &SignalPDragonJewel, 1);
-        return 1;
-    }
-    else {
-        semopChecked(semID, &SignalPDragonJewel, 1);
-        return 0;
-    }
-}
-
 void eat() {
-    semopChecked(semID, &WaitNMeal, 1);
+    semopChecked(semID, &WaitNMeal, 1); //guarantee that there is really a meal
     int i;
     for (i = 0; i < SHEEP_IN_MEAL; i++) {
         semopChecked(semID, &SignalSSheepWaiting, 1);
@@ -101,23 +16,18 @@ void eat() {
     //deal with sheep
     for (j = 0; j < SHEEP_IN_MEAL; j++) {
         semopChecked(semID, &SignalSSheepEaten, 1);
-        semopChecked(semID, &WaitSSheepDie, 1);
-        semopChecked(semID, &WaitPSheepEaten, 1);
-        *numSheepEaten = *numSheepEaten + 1;
-        semopChecked(semID, &SignalPSheepEaten, 1);
-        printf("Smaug eats one more Sheep, now %d sheep eaten\n", *numSheepEaten);
     }
     //deal with cows
     for (j = 0; j < COW_IN_MEAL; j++) {
         semopChecked(semID, &SignalSCowEaten, 1);
-        semopChecked(semID, &WaitSCowDie, 1);
-        semopChecked(semID, &WaitPCowEaten, 1);
-        *numCowEaten = *numCowEaten + 1;
-        semopChecked(semID, &SignalPCowEaten, 1);
-        printf("Smaug eats one more Cow, now %d cows eaten\n", *numCowEaten);
     }
+    semopChecked(semID, &WaitSMealDone, 1);
     *numMeal = *numMeal - 1;
-    printf("smaug eats one more meal, %d meals left\n", *numMeal);
+    semopChecked(semID, &WaitPEatenMeal, 1);
+    *numEatenMeal = *numEatenMeal + 1;
+    printf("smaug eats one more meal,%d meals eaten, %d meals left\n", *numEatenMeal, *numMeal);
+    semopChecked(semID, &SignalPEatenMeal, 1);
+
 }
 
 void swim() {
@@ -201,31 +111,21 @@ void smaug() {
     int time = 0;
     while (1) {  //sleeping/waking loop
         printf("Smaug is awake\n");
-
-
-        while (1) {
+        while (1) {  //swimming loop
             semopChecked(semID, &WaitPNumMeal, 1);
             //check whether there is meal
             if (*numMeal > 0) {
                 printf("smaug finds one meal\n");
                 eat();
                 semopChecked(semID, &SignalPNumMeal, 1);
-                if (checkSheep() || checkCow()) {
-                    break;
-                }
                 //check whether there is another meal
                 semopChecked(semID, &WaitPNumMeal, 1);
                 if (*numMeal > 0) {
                     printf("Smaug finds the second meal\n");
                     eat();
                     semopChecked(semID, &SignalPNumMeal, 1);
-                    if (checkSheep() || checkCow()) {
-                        break;
-                    }
-                    else {
-                        swim();
-                        continue;
-                    }
+                    swim();
+                    continue;
                 }
                 else {
                     semopChecked(semID, &SignalPNumMeal, 1);

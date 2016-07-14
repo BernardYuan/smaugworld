@@ -78,7 +78,41 @@ void sheep(int time) {
     }
 //    printf("Sheep %d is about to be eaten\n", localpid);
     semopChecked(semID, &WaitSSheepEaten, 1);
-    printf("Sheep %d is eaten\n", localpid);
-    semopChecked(semID, &SignalSSheepDie, 1);
+
+
+    semopChecked(semID, &WaitPSheepEaten, 1);
+    *numSheepEaten = *numSheepEaten + 1;
+    semopChecked(semID, &SignalPSheepEaten, 1);
+    printf("Sheep %d is eaten, now %d sheep eaten\n", localpid, *numSheepEaten);
+
+    semopChecked(semID, &SignalNMealSheep, 1);
+    //keep in this order to avoid deadlock
+    semopChecked(semID, &WaitPMealSheep, 1);
+    semopChecked(semID, &WaitPMealCow, 1);
+    *numMealSheep = *numMealSheep + 1;
+    if(*numMealSheep >= SHEEP_IN_MEAL && *nummealCow >= COW_IN_MEAL) {
+        int i;
+        for (i = 0; i < SHEEP_IN_MEAL ; i++) {
+            semopChecked(semID, &WaitNMealSheep, 1);
+            *numMealSheep = *numMealSheep - 1;
+        }
+
+        for (i = 0; i < COW_IN_MEAL ; i--) {
+            semopChecked(semID, &WaitNMealCow, 1);
+            *numMealCow = *numMealCow - 1;
+        }
+
+        printf("The last sheep in the snack is eaten, smaug finishes the snack\n");
+        semopChecked(semID, &SignalPMealCow, 1);
+        semopChecked(semID, &SignalPMealSheep, 1);
+        semopChecked(semID, &SignalSMealDone, 1);
+    }
+    else {
+        semopChecked(semID, &SignalPMealCow, 1);
+        semopChecked(semID, &SignalPMealSheep, 1);
+    }
+
+
+
 }
 

@@ -326,6 +326,90 @@ void shmAllocate(key_t key, size_t size, int shmflg1, const void *shmaddr, int s
     }
 }
 
+//the function which sets the termination
+void setTerminate() {
+    semopChecked(semID, &WaitPTermination, 1);
+    *flagTermination = 1;
+    semopChecked(semID, &SignalPTermination, 1);
+}
+
+int checkSheep() {
+    semopChecked(semID, &WaitPSheepEaten, 1);
+    if (*numSheepEaten >= MAX_SHEEP) {
+        printf("Smaug has eaten more than maximum number of sheep, the simulation will terminate\n");
+        setTerminate();
+        semopChecked(semID, &SignalPSheepEaten, 1);
+        return 1;
+    }
+    else {
+        semopChecked(semID, &SignalPSheepEaten, 1);
+        return 0;
+    }
+
+}
+
+int checkCow() {
+    semopChecked(semID, &WaitPCowEaten, 1);
+    if (*numCowEaten >= MAX_COW) {
+        printf("Smaug has eaten more than the maximum number of cows, the simulation will terminate\n");
+        setTerminate();
+        semopChecked(semID, &SignalPCowEaten, 1);
+        return 1;
+    }
+    else {
+        semopChecked(semID, &SignalPCowEaten, 1);
+        return 0;
+    }
+}
+
+int checkThief() {
+    semopChecked(semID, &WaitPThiefLeave, 1);
+    if (*numThiefLeave >= MAX_THIEF) {
+        printf("Smaug has played with more than maximum number of thieves, the simulation will terminate\n");
+        setTerminate();
+        semopChecked(semID, &SignalPThiefLeave, 1);
+        return 1;
+    }
+    else {
+        semopChecked(semID, &SignalPThiefLeave, 1);
+        return 0;
+    }
+}
+
+int checkHunter() {
+    semopChecked(semID, &WaitPHunterLeave, 1);
+    if (*numHunterLeave >= MAX_TREASUREHUNTER) {
+        printf("Smaug has fought with more than maximum number of hunters, the simulation will terminate\n");
+        setTerminate();
+        semopChecked(semID, &SignalPHunterLeave, 1);
+        return 1;
+    }
+    else {
+        semopChecked(semID, &SignalPHunterLeave, 1);
+        return 0;
+    }
+}
+
+int checkJewel() {
+    semopChecked(semID, &WaitPDragonJewel, 1);
+    if (*numDragonJewel >= MAX_JEWEL) {
+        printf("Dragon has more than maximum number of jewels, the simulation will terminate\n");
+        setTerminate();
+        semopChecked(semID, &SignalPDragonJewel, 1);
+        return 1;
+    }
+    else if (*numDragonJewel <= MIN_JEWEL) {
+        printf("Dragon has fewer than minimum number of jewels, the simulation will terminate\n");
+        setTerminate();
+        semopChecked(semID, &SignalPDragonJewel, 1);
+        return 1;
+    }
+    else {
+        semopChecked(semID, &SignalPDragonJewel, 1);
+        return 0;
+    }
+}
+
 int checkTermination() {
     semopChecked(semID, &WaitPTermination, 1);
     if (*flagTermination == 1) {
@@ -363,7 +447,6 @@ int main(void) {
                 int pr = random();
                 usleep(pr % 5555 + 5e5);
             }
-
         }
         int rn = random();
         if (rn % 4 == 0) sheep(1e6 + rn % 5555);

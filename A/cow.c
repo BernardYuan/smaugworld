@@ -6,9 +6,9 @@ void cow(int time) {
     //grazing
     if (usleep(time) == -1) {
         /* exit when usleep interrupted by kill signal */
-        if (errno == EINTR)exit(4);
+        if (errno == EINTR) exit(4);
     }
-    printf("cow %d is enchanted\n", localpid);
+    printf("c ow %d is enchanted\n", localpid);
     //the cow is enchanted
     //keep in this order in all files to avoid deadlock
     semopChecked(semID, &WaitPSheepInValley, 1); //use the number of sheep in valley
@@ -80,6 +80,37 @@ void cow(int time) {
     }
 //    printf("Cow %d is about to be eaten\n", localpid);
     semopChecked(semID, &WaitSCowEaten, 1);
-    printf("Cow %d is eaten\n", localpid);
-    semopChecked(semID, &SignalSCowDie, 1);
+
+
+    semopChecked(semID, &WaitPCowEaten, 1);
+    *numCowEaten = *numCowEaten + 1;
+    semopChecked(semID, &SignalPCowEaten, 1);
+    printf("Cow %d is eaten, now %d cows eaten\n", localpid, *numCowEaten);
+
+    semopChecked(semID, &SignalNMealCow, 1);
+    //keep in this order to avoid deadlock
+    semopChecked(semID, &WaitPMealSheep, 1);
+    semopChecked(semID, &WaitPMealCow, 1);
+    *numMealCow = *numMealCow + 1;
+    if(*numMealSheep >= SHEEP_IN_MEAL && *nummealCow >= COW_IN_MEAL) {
+        int i;
+        for (i = 0; i < SHEEP_IN_MEAL ; i++) {
+            semopChecked(semID, &WaitNMealSheep, 1);
+            *numMealSheep = *numMealSheep - 1;
+        }
+
+        for (i = 0; i < COW_IN_MEAL ; i--) {
+            semopChecked(semID, &WaitNMealCow, 1);
+            *numMealCow = *numMealCow - 1;
+        }
+
+        printf("The last Cow in the snack is eaten, smaug finishes the snack\n");
+        semopChecked(semID, &SignalPMealCow, 1);
+        semopChecked(semID, &SignalPMealSheep, 1);
+        semopChecked(semID, &SignalSMealDone, 1);
+    }
+    else {
+        semopChecked(semID, &SignalPMealCow, 1);
+        semopChecked(semID, &SignalPMealSheep, 1);
+    }
 }

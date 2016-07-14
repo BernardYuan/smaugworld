@@ -65,6 +65,8 @@ extern int *numEatenMeal;
 extern struct sembuf WaitPEatenMeal;
 extern struct sembuf SignalPEatenMeal;
 
+
+
 //semaphores of sheep
 #define SEM_N_SHEEPINVALLEY  9
 extern struct sembuf WaitNSheepInValley;
@@ -177,11 +179,31 @@ extern int *numThiefLeave;
 extern struct sembuf WaitPThiefLeave;
 extern struct sembuf SignalPThiefLeave;
 // semaphores of this system
-#define SEM_P_TERMINATION 36
+#define SEM_P_TERMINATION    36
 extern int flagTerminationFlag;
 extern int *flagTermination;
 extern struct sembuf WaitPTermination;
 extern struct sembuf SignalPTermination;
+
+#define SEM_N_MEALSHEEP     37
+extern struct sembuf WaitNMealSheep;
+extern struct sembuf SignalNMealSheep;
+#define SEM_N_MEALCOW       38
+extern struct sembuf WaitNMealCow;
+extern struct sembuf SignalNMealCow;
+#define SEM_P_MEALSHEEP     39
+extern int numMealSheepFlag;
+extern int *numMealSheep;
+extern struct sembuf WaitPMealSheep;
+extern struct sembuf SignalPMealSheep;
+#define SEM_P_MEALCOW       40
+extern int numMealCowFlag;
+extern int numMealCow;
+extern struct sembuf WaitPMealCow;
+extern struct sembuf SignalPMealCow;
+#define SEM_S_MEALDONE       39
+extern struct sembuf WaitSMealDone;
+extern struct sembuf SignalSMealDone;
 
 //make variables external so that they are visible in other files
 extern int semID;
@@ -189,13 +211,15 @@ extern union semun seminfo;
 
 //function initialization
 void initialize();
-
 void releaseResource();
-
 void semctlChecked(int semID, int semNum, int flag, union semun seminfo);
-
 void semopChecked(int semID, struct sembuf *operation, unsigned num);
-
 void shmAllocate(key_t key, size_t size, int shmflg1, const void *shmaddr, int shmflg2, int *flag, int **addr);
 
+void setTerminate();
+int checkSheep();
+int checkCow();
+int checkThief();
+int checkHunter();
+int checkJewel();
 int checkTermination();
