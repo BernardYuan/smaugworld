@@ -16,8 +16,8 @@ struct timeval startTime;
 
 //pointers to shared memory
 // shared memory of dragon
-int DragonWakeUpFlag = 0;
-int *DragonWakeUp = NULL;
+//int DragonWakeUpFlag = 0;
+//int *DragonWakeUp = NULL;
 int numDragonJewelFlag = 0;
 int *numDragonJewel = NULL;
 
@@ -34,6 +34,8 @@ int numSheepToEatFlag = 0;
 int *numSheepToEat = NULL;
 int numSheepEatenFlag = 0;
 int *numSheepEaten = NULL;
+int numMealSheepFlag = 0;
+int *numMealSheep = NULL;
 
 //Shared Variables of Cow
 int CowInValleyFlag = 0;
@@ -42,6 +44,8 @@ int numCowToEatFlag = 0;
 int *numCowToEat = NULL;
 int numCowEatenFlag = 0;
 int *numCowEaten = NULL;
+int numMealCowFlag = 0;
+int *numMealCow = NULL;
 
 //shared variables of Hunters
 int numHunterPathFlag = 0;
@@ -66,9 +70,6 @@ struct sembuf SignalSDragonWakeUp = {SEM_S_DRAGONWAKEUP, 1, 0};
 //Dragon Eat
 struct sembuf WaitSDragonEat = {SEM_S_DRAGONEAT, -1, 0};
 struct sembuf SignalSDragonEat = {SEM_S_DRAGONEAT, 1, 0};
-//protecting the shared memory of dragon wakeup flag
-struct sembuf WaitPDragonWakeUp = {SEM_P_DRAGONWAKEUP, -1, 0};
-struct sembuf SignalPDragonWakeUp = {SEM_P_DRAGONWAKEUP, 1, 0};
 //protecting number of jewels dragon has
 struct sembuf WaitPDragonJewel = {SEM_P_DRAGONJEWEL, -1, 0};
 struct sembuf SignalPDragonJewel = {SEM_P_DRAGONJEWEL, 1, 0};
@@ -89,6 +90,9 @@ struct sembuf SignalPNumMeal = {SEM_P_NUMMEAL, 1, 0};
 //protecting shared memory variable number of eaten meals
 struct sembuf WaitPEatenMeal = {SEM_P_EATENMEAL, -1, 0};
 struct sembuf SignalPEatenMeal = {SEM_P_EATENMEAL, 1, 0};
+//State semaphore of meal done
+struct sembuf WaitSMealDone = {SEM_S_MEALDONE, -1, 0};
+struct sembuf SignalSMealDone = {SEM_S_MEALDONE, 1, 0};
 
 //semaphores of sheep
 //number of sheep in Valley
@@ -112,9 +116,12 @@ struct sembuf SignalSSheepEaten = {SEM_S_SHEEPEATEN, 1, 0};
 // protecting sheep eaten
 struct sembuf WaitPSheepEaten = {SEM_P_SHEEPEATEN, -1, 0};
 struct sembuf SignalPSheepEaten = {SEM_P_SHEEPEATEN, 1, 0};
-// sheep die
-struct sembuf WaitSSheepDie = {SEM_S_SHEEPDIE, -1, 0};
-struct sembuf SignalSSheepDie = {SEM_S_SHEEPDIE, 1, 0};
+//protecting number of eaten sheep in a meal
+struct sembuf WaitPMealSheep = {SEM_P_MEALSHEEP, -1, 0};
+struct sembuf SignalPMealSheep = {SEM_P_MEALSHEEP, 1, 0};
+//semaphore of eaten sheep in the meal
+struct sembuf WaitNMealSheep = {SEM_N_MEALSHEEP, -1, 0};
+struct sembuf SignalNMealSheep = {SEM_N_MEALSHEEP, 1, 0};
 
 //semaphores of Cow
 //Cow in Valley
@@ -138,9 +145,12 @@ struct sembuf SignalSCowEaten = {SEM_S_COWEATEN, 1, 0};
 //protector of Cow eaten
 struct sembuf WaitPCowEaten = {SEM_P_COWEATEN, -1, 0};
 struct sembuf SignalPCowEaten = {SEM_P_COWEATEN, 1, 0};
-//cow die
-struct sembuf WaitSCowDie = {SEM_S_COWDIE, -1, 0};
-struct sembuf SignalSCowDie = {SEM_S_COWDIE, 1, 0};
+// protecting the number of cows in the meal
+struct sembuf WaitPMealCow = {SEM_P_MEALCOW, -1, 0};
+struct sembuf SignalPMealCow = {SEM_P_MEALCOW, 1, 0};
+// number of cows in the meal
+struct sembuf WaitNMealCow = {SEM_N_MEALCOW, -1, 0};
+struct sembuf SignalNMealCow = {SEM_N_MEALCOW, 1, 0};
 
 //semaphores of hunters
 //hunters in the path
@@ -187,8 +197,7 @@ struct sembuf WaitPTermination = {SEM_P_TERMINATION, -1, 0};
 struct sembuf SignalPTermination = {SEM_P_TERMINATION, 1, 0};
 //function definitions
 void initialize() {
-    semID = semget(IPC_PRIVATE, 36, 0666 | IPC_CREAT);
-
+    semID = semget(IPC_PRIVATE, 39, 0666 | IPC_CREAT);
 
     //initialize values of semaphore
     //semaphores of Dragon
@@ -198,12 +207,13 @@ void initialize() {
     semctlChecked(semID, SEM_S_DRAGONFIGHT, SETVAL, seminfo);
     semctlChecked(semID, SEM_S_DRAGONPLAY, SETVAL, seminfo);
     seminfo.val = 1;
-    semctlChecked(semID, SEM_P_DRAGONWAKEUP, SETVAL, seminfo);
+//    semctlChecked(semID, SEM_P_DRAGONWAKEUP, SETVAL, seminfo);
     semctlChecked(semID, SEM_P_DRAGONJEWEL, SETVAL, seminfo);
 
     //semaphores of meals
     seminfo.val = 0;
     semctlChecked(semID, SEM_N_MEAL, SETVAL, seminfo);
+    semctlChecked(semID, SEM_S_MEALDONE, SETVAL, seminfo);
     seminfo.val = 1;
     semctlChecked(semID, SEM_P_NUMMEAL, SETVAL, seminfo);
     semctlChecked(semID, SEM_P_EATENMEAL, SETVAL, seminfo);
@@ -214,11 +224,12 @@ void initialize() {
     semctlChecked(semID, SEM_S_SHEEPWAITING, SETVAL, seminfo);
     semctlChecked(semID, SEM_N_SHEEPTOEAT, SETVAL, seminfo);
     semctlChecked(semID, SEM_S_SHEEPEATEN, SETVAL, seminfo);
-    semctlChecked(semID, SEM_S_SHEEPDIE, SETVAL, seminfo);
+    semctlChecked(semID, SEM_N_MEALSHEEP, SETVAL, seminfo);
     seminfo.val = 1;
     semctlChecked(semID, SEM_P_SHEEPINVALLEY, SETVAL, seminfo);
     semctlChecked(semID, SEM_P_SHEEPTOEAT, SETVAL, seminfo);
     semctlChecked(semID, SEM_P_SHEEPEATEN, SETVAL, seminfo);
+    semctlChecked(semID, SEM_P_MEALSHEEP, SETVAL, seminfo);
 
     //semaphores of cows
     seminfo.val = 0;
@@ -226,18 +237,18 @@ void initialize() {
     semctlChecked(semID, SEM_S_COWWAITING, SETVAL, seminfo);
     semctlChecked(semID, SEM_N_COWTOEAT, SETVAL, seminfo);
     semctlChecked(semID, SEM_S_COWEATEN, SETVAL, seminfo);
-    semctlChecked(semID, SEM_S_COWDIE, SETVAL, seminfo);
+    semctlChecked(semID, SEM_N_MEALCOW, SETVAL, seminfo);
     seminfo.val = 1;
     semctlChecked(semID, SEM_P_COWINVALLEY, SETVAL, seminfo);
     semctlChecked(semID, SEM_P_COWTOEAT, SETVAL, seminfo);
     semctlChecked(semID, SEM_P_COWEATEN, SETVAL, seminfo);
+    semctlChecked(semID, SEM_P_MEALCOW, SETVAL, seminfo);
 
     //semaphores of hunters
     seminfo.val = 0;
     semctlChecked(semID, SEM_N_HUNTERPATH, SETVAL, seminfo);
     semctlChecked(semID, SEM_S_HUNTERCAVE, SETVAL, seminfo);
     semctlChecked(semID, SEM_S_HUNTERFIGHT, SETVAL, seminfo);
-    semctlChecked(semID, SEM_S_HUNTERLEAVE, SETVAL, seminfo);
     seminfo.val = 1;
     semctlChecked(semID, SEM_P_HUNTERPATH, SETVAL, seminfo);
     semctlChecked(semID, SEM_P_HUNTERLEAVE, SETVAL, seminfo);
@@ -247,7 +258,6 @@ void initialize() {
     semctlChecked(semID, SEM_N_THIEFPATH, SETVAL, seminfo);
     semctlChecked(semID, SEM_S_THIEFCAVE, SETVAL, seminfo);
     semctlChecked(semID, SEM_S_THIEFPLAY, SETVAL, seminfo);
-    semctlChecked(semID, SEM_S_THIEFLEAVE, SETVAL, seminfo);
     seminfo.val = 1;
     semctlChecked(semID, SEM_P_THIEFPATH, SETVAL, seminfo);
     semctlChecked(semID, SEM_P_THIEFLEAVE, SETVAL, seminfo);
@@ -258,7 +268,7 @@ void initialize() {
 
     //allocate shared memory
     //shared memory for dragon
-    shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &DragonWakeUpFlag, &DragonWakeUp);
+//    shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &DragonWakeUpFlag, &DragonWakeUp);
     shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &numDragonJewelFlag, &numDragonJewel);
     //shared memory for meal
     shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &numMealFlag, &numMeal);
@@ -267,10 +277,12 @@ void initialize() {
     shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &SheepInValleyFlag, &SheepInValley);
     shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &numSheepToEatFlag, &numSheepToEat);
     shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &numSheepEatenFlag, &numSheepEaten);
+    shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &numMealSheepFlag, &numMealSheep);
     //shared memory for cow
     shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &CowInValleyFlag, &CowInValley);
     shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &numCowToEatFlag, &numCowToEat);
     shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &numCowEatenFlag, &numCowEaten);
+    shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &numMealCowFlag, &numMealCow);
     //shared memory for hunter
     shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &numHunterPathFlag, &numHunterPath);
     shmAllocate(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666, NULL, 0, &numHunterLeaveFlag, &numHunterLeave);

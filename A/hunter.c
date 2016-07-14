@@ -20,20 +20,11 @@ void hunter() {
     printf("Hunter %d enters the magic path, now %d hunters in path\n", localpid, *numHunterPath);
     semopChecked(semID, &SignalSDragonWakeUp, 1);
 
-    semopChecked(semID, &WaitPDragonWakeUp, 1);
-    if(*DragonWakeUp == 0) {
-        *DragonWakeUp = 1; //assign 1 means, there has already been a snack or a visitor waking up smaug
-        semopChecked(semID, &SignalSDragonWakeUp, 1);
-        printf("The hunter %d wakes up the dragon\n", localpid);
-    }
-    semopChecked(semID, &SignalPDragonWakeUp, 1);
-
     semopChecked(semID, &WaitSHunterCave, 1);
     printf("Hunter %d enters the cave\n", localpid);
     semopChecked(semID, &SignalSDragonFight, 1);
     semopChecked(semID, &WaitSHunterFight, 1);
     printf("Hunter finishes fighting and leaves\n");
-    semopChecked(semID, &SignalSHunterLeave, 1);
 
     semopChecked(semID, &WaitPHunterLeave, 1);
     *numHunterLeave = *numHunterLeave + 1;

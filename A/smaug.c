@@ -1,8 +1,10 @@
 #include "smaug.h"
-int newWakeup = 0;
+int newWakeup = 1;
+//smaug eats a meal
 void eat() {
     semopChecked(semID, &WaitNMeal, 1); //guarantee that there is really a meal
     int i;
+    // let the sheep and cows be ready to be eaten
     for (i = 0; i < SHEEP_IN_MEAL; i++) {
         semopChecked(semID, &SignalSSheepWaiting, 1);
     }
@@ -22,7 +24,10 @@ void eat() {
     for (j = 0; j < COW_IN_MEAL; j++) {
         semopChecked(semID, &SignalSCowEaten, 1);
     }
+
+    //waiting the meal to be done
     semopChecked(semID, &WaitSMealDone, 1);
+    //decrement the number of meals
     *numMeal = *numMeal - 1;
     semopChecked(semID, &WaitPEatenMeal, 1);
     *numEatenMeal = *numEatenMeal + 1;
@@ -30,7 +35,7 @@ void eat() {
     semopChecked(semID, &SignalPEatenMeal, 1);
 
 }
-
+//smaug swims
 void swim() {
     printf("smaug starts swimming\n");
     if (usleep(1e6) == -1) {
@@ -40,12 +45,13 @@ void swim() {
     printf("smaug finishes swimming\n");
 }
 
+//smaug fights the treasure hunter
 void fight() {
 
     semopChecked(semID, &WaitNHunterPath, 1);
+    *numHunterPath = *numHunterPath - 1;
     printf("Smaug is ready to interact with a hunter waiting in the path");
     semopChecked(semID, &SignalSHunterCave, 1);
-
 
     semopChecked(semID, &WaitSDragonFight, 1);
     printf("Smaug fights with the hunter\n");
@@ -62,12 +68,18 @@ void fight() {
         printf("The hunter fights well and get rewarded with 10 jewels, now smaug has %d jewels\n", *numDragonJewel);
         semopChecked(semID, &SignalPDragonJewel, 1);
     }
+    if(checkJewel()) {
+        terminateSimulation();
+        exit(0);
+    }
     semopChecked(semID, &SignalSHunterFight, 1);
 }
 
+//smaug plays with the thief
 void play() {
 
     semopChecked(semID, &WaitNThiefPath, 1);
+    *numThiefPath = *numThiefPath - 1;
     printf("Smaug is ready to interact with a thief waiting in the path");
     semopChecked(semID, &SignalSThiefCave, 1);
 
@@ -94,110 +106,82 @@ void smaug() {
     printf("ProcessID of smaug:%d\n", localid);
     printf("Smaug is sleeping\n");
 
-    semopChecked(semID, &WaitPDragonWakeUp, 1);
-    *DragonWakeUp = 0;
-    semopChecked(semID, &SignalPDragonWakeUp, 1);
-
     semopChecked(semID, &WaitSDragonWakeUp, 1);
+    newWakeup = 1;
     int time = 0;
     while (1) {  //sleeping/waking loop
         printf("Smaug is awake\n");
         while (1) {  //swimming loop
-            semopChecked(semID, &WaitPNumMeal, 1);
-            //check whether there is meal
-            if (*numMeal > 0) {
+            // the meal, thief, hunter process in this loop
+            int onceMeal = 0;
+            int onceThief = 0;
+            int onceHunter = 0;
 
-                if(newWakeup==0) newWakeup = 1;
+            //looking for meals
+            semopChecked(semID, &WaitPNumMeal, 1);
+            while(*numMeal > 0 && onceMeal < MEAL_ONCE) {
+                if(newWakeup==1) newWakeup = 0;
                 else semopChecked(semID, &WaitSDragonWakeUp, 1);
 
-                printf("smaug finds one meal\n");
+                printf("Smaug finds the %d-th snack\n", onceMeal+1);
                 eat();
-                semopChecked(semID, &SignalPNumMeal, 1);
-                //check whether there is another meal
-                semopChecked(semID, &WaitPNumMeal, 1);
-                if (*numMeal > 0) {
-                    printf("Smaug finds the second meal\n");
-                    eat();
-                    semopChecked(semID, &SignalPNumMeal, 1);
-                    swim();
-                    continue;
-                }
-                else {
-                    semopChecked(semID, &SignalPNumMeal, 1);
-                    printf("There is no second meal\n");
-                    swim();
-                    continue;
-                }
+                onceMeal ++;
+            }
+            semopChecked(semID, &SignalPNumMeal, 1);
+
+            //check meal this round
+            if(onceMeal > 0) {  //if the
+                swim();
+                continue;
+            }
+            else printf("Smaug finds no meals, it goes to look for thieves\n");
+
+            //looking for thieves
+            semopChecked(semID, &WaitPThiefPath, 1);
+            while(*numThiefPath > 0 && onceThief < THIEF_ONCE) {
+                if(newWakeup==1) newWakeup = 0;
+                else semopChecked(semID, &WaitSDragonWakeUp, 1);
+
+                printf("Smaug finds the %d-th thief\n", onceThief+1);
+                play();
+                onceThief ++;
+            }
+            semopChecked(semID, &SignalPThiefPath, 1);
+
+            //check thief this round
+            if(onceThief > 0) {
+                printf("Smaug is a happy dragon now, it curls up its jewels and goes to sleep\n");
+                break;
+            }
+            else printf("Smaug finds no thieves, it goes to look for hunters\n");
+
+
+            //looking for hunters
+            semopChecked(semID, &WaitPHunterPath, 1);
+            while(*numHunterPath > 0 && onceHunter < HUNTER_ONCE) {
+                if(newWakeup==1) newWakeup = 0;
+                else semopChecked(semID, &WaitSDragonWakeUp, 1);
+
+                printf("Smaug finds the %d-th hunter\n");
+                fight();
+                onceHunter++;
+            }
+            semopChecked(semID, &SignalPHunterPath, 1);
+
+            //check hunter
+            if(onceHunter > 0) {
+                printf("Smaug fights with the treasure hunter and goes to swim\n");
+                swim();
+                continue;
             }
             else {
-                printf("No meals, smaug looks for thieves to play with\n");
-                semopChecked(semID, &SignalPNumMeal, 1);
-                semopChecked(semID, &WaitPThiefPath, 1);
-                if (*numThiefPath > 0) {
-
-                    if(newWakeup==0) newWakeup = 1;
-                    else semopChecked(semID, &WaitSDragonWakeUp, 1);
-
-                    printf("Smaug finds one thief\n");
-                    play();
-                    semopChecked(semID, &SignalPThiefPath, 1);
-                    if (checkJewel()) {
-                        terminateSimulation();
-                    }
-                    semopChecked(semID, &WaitPThiefPath, 1);
-                    if (*numThiefPath > 0) {
-                        printf("Smaug finds the second thief to play with");
-                        play();
-                        semopChecked(semID, &SignalPThiefPath, 1);
-                        if (checkJewel()) {
-                            terminateSimulation();
-                        }
-                        printf("Smaug plays with 2 thieves, and goes to sleep\n");
-                    }
-                    else {
-                        semopChecked(semID, &SignalPThiefPath, 1);
-                        printf("Smaug doesn't find the second thief to play with\n");
-                        break;
-                    }
-                }
-                else {
-                    printf("No thieves smaug looks for treasure hunters to fight\n");
-                    semopChecked(semID, &SignalPThiefPath, 1);
-
-                    semopChecked(semID, &WaitPHunterPath, 1);
-                    if (*numHunterPath > 0) {
-
-                        if(newWakeup==0) newWakeup = 1;
-                        else semopChecked(semID, &WaitSDragonWakeUp, 1);
-
-                        fight();
-                        semopChecked(semID, &SignalPHunterPath, 1);
-                        if (checkJewel()) {
-                            terminateSimulation();
-                        }
-                        printf("Smaug fights a treasure hunter, and goes to swim\n");
-                        swim();
-                        continue;
-
-                    }
-                    else {
-                        semopChecked(semID, &SignalPHunterPath, 1);
-                        printf("No treasure hunter, smaug goes to sleep");
-                        break;
-                    }
-                }
-
+                printf("Smaug finds no hunters, there is nothing left, smaug goes to sleep\n");
+                break;
             }
         }
 
-        if (checkTermination()) break;
-        // the dragon is about to fall in sleep
-        semopChecked(semID, &WaitPDragonWakeUp, 1);
-        *DragonWakeUp = 0;
-        semopChecked(semID, &SignalPDragonWakeUp, 1);
         printf("Smaug goes to sleep\n");
         semopChecked(semID, &WaitSDragonWakeUp, 1);
-        newWakeup = 0;
+        newWakeup = 1;
     }
-    exit(0);
 }

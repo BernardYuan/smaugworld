@@ -10,6 +10,8 @@ void sheep(int time) {
     }
     printf("sheep %d is enchanted\n", localpid);
     //the sheep is enchanted
+
+    //keep in this order to get use
     semopChecked(semID, &WaitPSheepInValley, 1);
     semopChecked(semID, &WaitPCowInValley, 1);
     *SheepInValley = *SheepInValley + 1;
@@ -36,22 +38,20 @@ void sheep(int time) {
         semopChecked(semID, &SignalPCowInValley, 1);
         semopChecked(semID, &SignalPSheepInValley, 1);
 
-        semopChecked(semID, &WaitPDragonWakeUp, 1);
-
-//        printf("The last sheep %d in the meal wakes up the dragon\n", localpid);
+        //send a wake up to the dragon
         semopChecked(semID, &SignalSDragonWakeUp, 1);
-
-        semopChecked(semID, &SignalPDragonWakeUp, 1);
     }
     else { //the sheep in the Valley is not enough for a meal
         semopChecked(semID, &SignalPCowInValley, 1);
         semopChecked(semID, &SignalPSheepInValley, 1);
     }
 
-//    printf("Sheep %d waiting in the snack\n", localpid);
+    // sheep waiting
     semopChecked(semID, &WaitSSheepWaiting, 1);
 
     semopChecked(semID, &SignalNSheepToEat, 1);
+
+    // smaug starts eating only when the the meal is ready
     semopChecked(semID, &WaitPSheepToEat, 1);
     semopChecked(semID, &WaitPCowToEat, 1);
     *numSheepToEat = *numSheepToEat + 1;
@@ -77,7 +77,6 @@ void sheep(int time) {
     }
 //    printf("Sheep %d is about to be eaten\n", localpid);
     semopChecked(semID, &WaitSSheepEaten, 1);
-
 
     semopChecked(semID, &WaitPSheepEaten, 1);
     *numSheepEaten = *numSheepEaten + 1;
@@ -114,8 +113,5 @@ void sheep(int time) {
         semopChecked(semID, &SignalPMealCow, 1);
         semopChecked(semID, &SignalPMealSheep, 1);
     }
-
-
-
 }
 
