@@ -15,8 +15,10 @@ void hunter() {
     semopChecked(semID, &SignalNHunterPath, 1);
     semopChecked(semID, &WaitPHunterPath, 1);
     *numHunterPath = *numHunterPath + 1;
-    printf("Hunter %d enters the magic path, now %d hunters in path\n", localpid, *numHunterPath);
     semopChecked(semID, &SignalPHunterPath, 1);
+
+    printf("Hunter %d enters the magic path, now %d hunters in path\n", localpid, *numHunterPath);
+    semopChecked(semID, &SignalSDragonWakeUp, 1);
 
     semopChecked(semID, &WaitPDragonWakeUp, 1);
     if(*DragonWakeUp == 0) {
@@ -33,4 +35,13 @@ void hunter() {
     printf("Hunter finishes fighting and leaves\n");
     semopChecked(semID, &SignalSHunterLeave, 1);
 
+    semopChecked(semID, &WaitPHunterLeave, 1);
+    *numHunterLeave = *numHunterLeave + 1;
+    printf("Smaug has fought %d hunters\n", *numHunterLeave);
+    semopChecked(semID, &SignalPHunterLeave, 1);
+
+    if(checkHunter()) {
+        terminateSimulation();
+    }
+    exit(0);
 }

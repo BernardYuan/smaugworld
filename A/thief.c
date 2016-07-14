@@ -14,8 +14,12 @@ void thief() {
     semopChecked(semID, &SignalNThiefPath, 1);
     semopChecked(semID, &WaitPThiefPath, 1);
     *numThiefPath = *numThiefPath + 1;
-    printf("Thief %d enters the magic path, now %d thieves in path\n", localpid, *numThiefPath);
     semopChecked(semID, &SignalPThiefPath, 1);
+
+    printf("Thief %d enters the magic path, now %d thieves in path\n", localpid, *numThiefPath);
+    semopChecked(semID, &SignalSDragonWakeUp, 1);
+
+
 
     semopChecked(semID, &WaitPDragonWakeUp, 1);
     if(*DragonWakeUp == 0) {
@@ -30,5 +34,13 @@ void thief() {
     semopChecked(semID, &SignalSDragonPlay, 1);
     semopChecked(semID, &WaitSThiefPlay, 1);
     printf("Thief finishes playings and leaves\n");
-    semopChecked(semID, &SignalSThiefLeave, 1);
+
+    semopChecked(semID, &WaitPThiefLeave, 1);
+    *numThiefLeave = *numThiefLeave + 1;
+    printf("Smaug has played with %d thieves\n", *numThiefLeave);
+    semopChecked(semID, &SignalPThiefLeave, 1);
+    if(checkThief()) {
+        terminateSimulation();
+    }
+    exit(0);
 }

@@ -39,11 +39,10 @@ void cow(int time) {
         semopChecked(semID, &SignalPSheepInValley, 1);
 
         semopChecked(semID, &WaitPDragonWakeUp, 1);
-        if(*DragonWakeUp == 0) {
-            *DragonWakeUp = 1; //assign 1 means the dragon is waken up once now
-            semopChecked(semID, &SignalSDragonWakeUp, 1);
-            printf("The last cow %d in the meal wakes up the dragon\n", localpid);
-        }
+
+//        printf("The last cow %d in the meal wakes up the dragon\n", localpid);
+        semopChecked(semID, &SignalSDragonWakeUp, 1);
+
         semopChecked(semID, &SignalPDragonWakeUp, 1);
     }
     else { //the cow in the Valley is not enough for a meal
@@ -86,6 +85,11 @@ void cow(int time) {
     *numCowEaten = *numCowEaten + 1;
     semopChecked(semID, &SignalPCowEaten, 1);
     printf("Cow %d is eaten, now %d cows eaten\n", localpid, *numCowEaten);
+    if(checkCow()) {
+        terminateSimulation();
+        exit(0);
+
+    }
 
     semopChecked(semID, &SignalNMealCow, 1);
     //keep in this order to avoid deadlock

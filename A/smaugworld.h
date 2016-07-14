@@ -211,6 +211,7 @@ extern union semun seminfo;
 
 //function initialization
 void initialize();
+void terminateSimulation();
 void releaseResource();
 void semctlChecked(int semID, int semNum, int flag, union semun seminfo);
 void semopChecked(int semID, struct sembuf *operation, unsigned num);
