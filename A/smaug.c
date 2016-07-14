@@ -64,13 +64,21 @@ void fight() {
     }
     else {
         semopChecked(semID, &WaitPDragonJewel, 1);
-        *numDragonJewel = *numDragonJewel - 10;
-        printf("The hunter fights well and get rewarded with 10 jewels, now smaug has %d jewels\n", *numDragonJewel);
+
+        printf("The hunter fights well and will get rewarded with 10 jewels\n");
+	if(*numDragonJewel >= 10 ) {
+		*numDragonJewel = *numDragonJewel - 10; 
+		printf("Smaug gives 10 jewels, now it has %d jewels\n", *numDragonJewel);
+	}
+        else {
+		printf("Smaug has only %d jewels, the simulation will terminate\n", *numDragonJewel);
+		terminateSimulation();
+		
+	}
         semopChecked(semID, &SignalPDragonJewel, 1);
     }
     if(checkJewel()) {
         terminateSimulation();
-        exit(0);
     }
     semopChecked(semID, &SignalSHunterFight, 1);
 }
@@ -83,7 +91,7 @@ void play() {
     printf("Smaug is ready to interact with a thief waiting in the path");
     semopChecked(semID, &SignalSThiefCave, 1);
 
-    semopChecked(semID, &WaitSThiefPlay, 1);
+    semopChecked(semID, &WaitSDragonPlay, 1);
     printf("Smaug fights with the hunter\n");
     int fightrand = random();
     if (fightrand % 2 == 1) {
@@ -94,10 +102,21 @@ void play() {
     }
     else {
         semopChecked(semID, &WaitPDragonJewel, 1);
-        *numDragonJewel = *numDragonJewel - 8;
-        printf("The thief wins and gets rewarded with 10 jewels, now smaug has %d jewels\n", *numDragonJewel);
-        semopChecked(semID, &SignalPDragonJewel, 1);
+        printf("The thief wins and will get rewarded with 8 jewels\n");
+	if(*numDragonJewel >= 8) {
+		*numDragonJewel = *numDragonJewel - 8;
+		printf("Smaug loses 8 jewels, now it has %d jewels\n", *numDragonJewel);
+	}
+	else {
+		printf("Smaug has only %d jewels, now simulation terminates\n", *numDragonJewel);
+		terminateSimulation();
+	}
+	semopChecked(semID, &SignalPDragonJewel, 1);
     }
+    if(checkJewel()) {
+        terminateSimulation();
+    }
+
     semopChecked(semID, &SignalSThiefPlay, 1);
 }
 
@@ -162,7 +181,7 @@ void smaug() {
                 if(newWakeup==1) newWakeup = 0;
                 else semopChecked(semID, &WaitSDragonWakeUp, 1);
 
-                printf("Smaug finds the %d-th hunter\n");
+                printf("Smaug finds the %d-th hunter\n", onceHunter + 1);
                 fight();
                 onceHunter++;
             }

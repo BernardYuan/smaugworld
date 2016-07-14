@@ -3,11 +3,11 @@
 //
 #include "hunter.h"
 
-void hunter() {
+void hunter(int time) {
     pid_t localpid = getpid();
     printf("Hunter %d is looking for the path\n", localpid);
     int pathtime = random();
-    if (usleep(pathtime) == -1) {
+    if (usleep(time) == -1) {
         /* exit when usleep interrupted by kill signal */
         if (errno == EINTR)exit(4);
     }

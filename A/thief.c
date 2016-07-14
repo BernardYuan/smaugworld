@@ -2,11 +2,11 @@
 // Created by Bernard Yuan on 2016-07-10.
 //
 #include "thief.h"
-void thief() {
+void thief(int time) {
     pid_t localpid = getpid();
     printf("Thief %d is looking for the path\n", localpid);
-    int pathtime = random();
-    if (usleep(pathtime) == -1) {
+
+    if (usleep(time) == -1) {
         /* exit when usleep interrupted by kill signal */
         if (errno == EINTR)exit(4);
     }

@@ -61,7 +61,7 @@ extern struct sembuf WaitPNumMeal;
 extern struct sembuf SignalPNumMeal;
 #define SEM_P_EATENMEAL      8
 extern int numEatenMealFlag;
-extern int *numEatenMel;
+extern int *numEatenMeal;
 extern struct sembuf WaitPEatenMeal;
 extern struct sembuf SignalPEatenMeal;
 #define SEM_S_MEALDONE       9
@@ -139,7 +139,7 @@ extern struct sembuf WaitNMealCow;
 extern struct sembuf SignalNMealCow;
 #define SEM_P_MEALCOW        27
 extern int numMealCowFlag;
-extern int numMealCow;
+extern int *numMealCow;
 extern struct sembuf WaitPMealCow;
 extern struct sembuf SignalPMealCow;
 

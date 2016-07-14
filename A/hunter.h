@@ -3,4 +3,4 @@
 //
 
 #include "smaugworld.h"
-void hunter();
+void hunter(int time);

@@ -166,8 +166,8 @@ struct sembuf SignalSHunterCave = {SEM_S_HUNTERCAVE, 1, 0};
 struct sembuf WaitSHunterFight = {SEM_S_HUNTERFIGHT, -1, 0};
 struct sembuf SignalSHunterFight = {SEM_S_HUNTERFIGHT, 1, 0};
 //hunter leaving the Cave
-struct sembuf WaitSHunterLeave = {SEM_S_HUNTERLEAVE, -1, 0};
-struct sembuf SignalSHunterLeave = {SEM_S_HUNTERLEAVE, 1, 0};
+//struct sembuf WaitSHunterLeave = {SEM_S_HUNTERLEAVE, -1, 0};
+//struct sembuf SignalSHunterLeave = {SEM_S_HUNTERLEAVE, 1, 0};
 //counter of hunters dealt by smaug
 struct sembuf WaitPHunterLeave = {SEM_P_HUNTERLEAVE, -1, 0};
 struct sembuf SignalPHunterLeave = {SEM_P_HUNTERLEAVE, 1, 0};
@@ -186,8 +186,8 @@ struct sembuf SignalSThiefCave = {SEM_S_THIEFCAVE, 1, 0};
 struct sembuf WaitSThiefPlay = {SEM_S_THIEFPLAY, -1, 0};
 struct sembuf SignalSThiefPlay = {SEM_S_THIEFPLAY, 1, 0};
 //Thief leaves
-struct sembuf WaitSThiefLeave = {SEM_S_THIEFLEAVE, -1, 0};
-struct sembuf SignalSThiefLeave = {SEM_S_THIEFLEAVE, 1, 0};
+//struct sembuf WaitSThiefLeave = {SEM_S_THIEFLEAVE, -1, 0};
+//struct sembuf SignalSThiefLeave = {SEM_S_THIEFLEAVE, 1, 0};
 //protector of number of left thief
 struct sembuf WaitPThiefLeave = {SEM_P_THIEFLEAVE, -1, 0};
 struct sembuf SignalPThiefLeave = {SEM_P_THIEFLEAVE, 1, 0};
@@ -338,6 +338,9 @@ void shmAllocate(key_t key, size_t size, int shmflg1, const void *shmaddr, int s
     }
 }
 
+void terminateSimulation() {
+	printf("Terminate Simulation is executed tho not fully implemented\n");
+}
 //the function which sets the termination
 void setTerminate() {
     semopChecked(semID, &WaitPTermination, 1);
@@ -463,7 +466,7 @@ int main(void) {
         int rn = random();
         if (rn % 4 == 0) sheep(1e6 + rn % 5555);
         else if (rn % 4 == 1) cow(1e6 + rn % 6666);
-        else if (rn % 4 == 2) hunter();
-        else if (rn % 4 == 3) thief();
+        else if (rn % 4 == 2) hunter(1e6 + rn % 7777);
+        else if (rn % 4 == 3) thief(1e6 + rn % 8888);
     }
 }

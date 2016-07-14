@@ -92,7 +92,7 @@ void sheep(int time) {
     semopChecked(semID, &WaitPMealSheep, 1);
     semopChecked(semID, &WaitPMealCow, 1);
     *numMealSheep = *numMealSheep + 1;
-    if(*numMealSheep >= SHEEP_IN_MEAL && *nummealCow >= COW_IN_MEAL) {
+    if(*numMealSheep >= SHEEP_IN_MEAL && *numMealCow >= COW_IN_MEAL) {
         int i;
         for (i = 0; i < SHEEP_IN_MEAL ; i++) {
             semopChecked(semID, &WaitNMealSheep, 1);
