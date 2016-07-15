@@ -201,6 +201,7 @@ struct sembuf SignalPThiefLeave = {SEM_P_THIEFLEAVE, 1, 0};
 //semaphores of system
 struct sembuf WaitPTermination = {SEM_P_TERMINATION, -1, 0};
 struct sembuf SignalPTermination = {SEM_P_TERMINATION, 1, 0};
+
 //function definitions
 void initialize() {
     semID = semget(IPC_PRIVATE, 39, 0666 | IPC_CREAT);
@@ -343,57 +344,59 @@ void shmAllocate(key_t key, size_t size, int shmflg1, const void *shmaddr, int s
         printf("Attach Shared Memory Success\n");
     }
 }
+
 // deallocate memory
 void shmDeallocate(int *ptr) {
-    if(shmdt(ptr)==-1) {
+    if (shmdt(ptr) == -1) {
         printf("Release shared memory failed\n");
     }
     else {
         printf("Release shared memory success\n");
     }
 }
+
 void terminateSimulation() {
-	printf("Terminate Simulation is executed now\n");
+    printf("Terminate Simulation is executed now\n");
     pid_t localpid = getpid();
     pid_t localgid = getpgid(localpid);
 
-    if(localgid != dragonGID) {
-        if(killpg(dragonGID, SIGKILL) == -1 && errno == EPERM) {
+    if (localgid != dragonGID) {
+        if (killpg(dragonGID, SIGKILL) == -1 && errno == EPERM) {
             printf("Dragon not killed\n");
         }
-        printf("Dragon killed\n");
+        else printf("Dragon killed\n");
     }
 
-    if(localgid != beastGID) {
-        if(killpg(beastGID, SIGKILL) == -1 && errno == EPERM) {
+    if (localgid != beastGID) {
+        if (killpg(beastGID, SIGKILL) == -1 && errno == EPERM) {
             printf("Beasts not killed\n");
         }
-        printf("Beasts killed\n");
+        else printf("Beasts killed\n");
     }
 
-    if(localgid != thiefGID) {
-        if(killpg(thiefGID, SIGKILL) == -1 && errno == EPERM) {
+    if (localgid != thiefGID) {
+        if (killpg(thiefGID, SIGKILL) == -1 && errno == EPERM) {
             printf("Thieves not killed\n");
         }
-        printf("Thieves killed\n");
+        else printf("Thieves killed\n");
     }
 
-    if(localgid != hunterGID) {
-        if(killpg(hunterGID, SIGKILL) == -1 && errno == EPERM) {
+    if (localgid != hunterGID) {
+        if (killpg(hunterGID, SIGKILL) == -1 && errno == EPERM) {
             printf("Hunters not killed\n");
         }
-        printf("Hunters killed\n");
+        else printf("Hunters killed\n");
     }
-
-    int status;
-    while( (w = waitpid(-1, &status, WNOHANG)) > 1) {
-        printf("Process %d terminated\n", w);
-    }
-    releaseResource();
     exit(0);
 }
+
 //release resource
 void releaseResource() {
+
+    if(semctl(semID, 0, IPC_RMID, seminfo)==-1) {
+        printf("Release Semaphores Failed\n");
+    }
+
     //shared memory for dragon
     shmDeallocate(numDragonJewel);
     //shared memory for meal
@@ -418,6 +421,7 @@ void releaseResource() {
     //shared memory for the system
     shmDeallocate(flagTermination);
 }
+
 //the function which sets the termination
 void setTerminate() {
     semopChecked(semID, &WaitPTermination, 1);
@@ -529,8 +533,11 @@ int main(void) {
     else {
         pid_t r;
         while (1) {
-            if(checkTermination()) {
-                
+            int status;
+            if (checkTermination()) {
+                terminateSimulation();
+                releaseResource();
+                exit(0);
             }
             r = fork();
             if (r == 0) break;
