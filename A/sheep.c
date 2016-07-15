@@ -2,6 +2,7 @@
 
 void sheep(int time) {
     pid_t localpid = getpid();
+    setpgid(localpid, beastGID);
     printf("sheep %d is grazing for %d usec\n", localpid, time);
     //grazing
     if (usleep(time) == -1) {

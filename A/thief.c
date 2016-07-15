@@ -4,6 +4,7 @@
 #include "thief.h"
 void thief(int time) {
     pid_t localpid = getpid();
+    setpgid(localpid, thiefGID);
     printf("Thief %d is looking for the path\n", localpid);
 
     if (usleep(time) == -1) {

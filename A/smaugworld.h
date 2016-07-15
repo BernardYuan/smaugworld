@@ -31,6 +31,13 @@
 #define THIEF_ONCE 2
 #define HUNTER_ONCE 1
 
+//process group ids
+extern pid_t smaugID;
+extern const pid_t dragonGID;00
+extern const pid_t beastGID;
+extern const pid_t thiefGID;
+extern const pid_t hunterGID;
+
 // semaphores of the state of the dragon
 #define SEM_S_DRAGONWAKEUP   0
 extern struct sembuf WaitSDragonWakeUp;
@@ -203,6 +210,7 @@ void releaseResource();
 void semctlChecked(int semID, int semNum, int flag, union semun seminfo);
 void semopChecked(int semID, struct sembuf *operation, unsigned num);
 void shmAllocate(key_t key, size_t size, int shmflg1, const void *shmaddr, int shmflg2, int *flag, int **addr);
+void shmDeallocate(int *ptr);
 
 void setTerminate();
 int checkSheep();

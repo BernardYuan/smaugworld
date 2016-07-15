@@ -13,6 +13,12 @@ union semun {
     ushort *array;
 } seminfo;
 struct timeval startTime;
+//process group IDs
+pid_t smaugID;
+const pid_t dragonGID = 660;
+const pid_t beastID = 661;
+const pid_t thiefID = 662;
+const pid_t hunterID = 663;
 
 //pointers to shared memory
 // shared memory of dragon
@@ -337,9 +343,80 @@ void shmAllocate(key_t key, size_t size, int shmflg1, const void *shmaddr, int s
         printf("Attach Shared Memory Success\n");
     }
 }
-
+// deallocate memory
+void shmDeallocate(int *ptr) {
+    if(shmdt(ptr)==-1) {
+        printf("Release shared memory failed\n");
+    }
+    else {
+        printf("Release shared memory success\n");
+    }
+}
 void terminateSimulation() {
-	printf("Terminate Simulation is executed tho not fully implemented\n");
+	printf("Terminate Simulation is executed now\n");
+    pid_t localpid = getpid();
+    pid_t localgid = getpgid(localpid);
+
+    if(localgid != dragonGID) {
+        if(killpg(dragonGID, SIGKILL) == -1 && errno == EPERM) {
+            printf("Dragon not killed\n");
+        }
+        printf("Dragon killed\n");
+    }
+
+    if(localgid != beastGID) {
+        if(killpg(beastGID, SIGKILL) == -1 && errno == EPERM) {
+            printf("Beasts not killed\n");
+        }
+        printf("Beasts killed\n");
+    }
+
+    if(localgid != thiefGID) {
+        if(killpg(thiefGID, SIGKILL) == -1 && errno == EPERM) {
+            printf("Thieves not killed\n");
+        }
+        printf("Thieves killed\n");
+    }
+
+    if(localgid != hunterGID) {
+        if(killpg(hunterGID, SIGKILL) == -1 && errno == EPERM) {
+            printf("Hunters not killed\n");
+        }
+        printf("Hunters killed\n");
+    }
+
+    int status;
+    while( (w = waitpid(-1, &status, WNOHANG)) > 1) {
+        printf("Process %d terminated\n", w);
+    }
+    releaseResource();
+    exit(0);
+}
+//release resource
+void releaseResource() {
+    //shared memory for dragon
+    shmDeallocate(numDragonJewel);
+    //shared memory for meal
+    shmDeallocate(numMeal);
+    shmDeallocate(numEatenMeal);
+    //shared memory for sheep
+    shmDeallocate(SheepInValley);
+    shmDeallocate(numSheepToEat);
+    shmDeallocate(numSheepEaten);
+    shmDeallocate(numMealSheep);
+    //shared memory for cow
+    shmDeallocate(CowInValley);
+    shmDeallocate(numCowToEat);
+    shmDeallocate(numCowEaten);
+    shmDeallocate(numMealCow);
+    //shared memory for hunter
+    shmDeallocate(numHunterPath);
+    shmDeallocate(numHunterLeave);
+    //shared memory for thief
+    shmDeallocate(numThiefPath);
+    shmDeallocate(numThiefLeave);
+    //shared memory for the system
+    shmDeallocate(flagTermination);
 }
 //the function which sets the termination
 void setTerminate() {
@@ -429,7 +506,6 @@ int checkTermination() {
     semopChecked(semID, &WaitPTermination, 1);
     if (*flagTermination == 1) {
         semopChecked(semID, &SignalPTermination, 1);
-        semopChecked(semID, &SignalPTermination, 1);
         return 1;
     }
     else {
@@ -454,7 +530,7 @@ int main(void) {
         pid_t r;
         while (1) {
             if(checkTermination()) {
-                printf("The parent process starts terminating the simulation\n");
+                
             }
             r = fork();
             if (r == 0) break;

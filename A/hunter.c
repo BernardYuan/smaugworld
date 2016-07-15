@@ -5,6 +5,7 @@
 
 void hunter(int time) {
     pid_t localpid = getpid();
+    setpgid(localpid, hunterGID);
     printf("Hunter %d is looking for the path\n", localpid);
     int pathtime = random();
     if (usleep(time) == -1) {

@@ -122,9 +122,10 @@ void play() {
 
 void smaug() {
     pid_t localid = getpid();
-    printf("ProcessID of smaug:%d\n", localid);
+    smaugID = localid;
+    printf("ProcessID of smaug: %d\n", smaugID);
+    setpgid(smaugID, dragonGID);
     printf("Smaug is sleeping\n");
-
     semopChecked(semID, &WaitSDragonWakeUp, 1);
     newWakeup = 1;
     int time = 0;
