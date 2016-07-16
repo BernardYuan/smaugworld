@@ -16,9 +16,9 @@ struct timeval startTime;
 //process group IDs
 pid_t smaugID;
 const pid_t dragonGID = 660;
-const pid_t beastID = 661;
-const pid_t thiefID = 662;
-const pid_t hunterID = 663;
+const pid_t beastGID = 661;
+const pid_t thiefGID = 662;
+const pid_t hunterGID = 663;
 
 //pointers to shared memory
 // shared memory of dragon
@@ -550,7 +550,9 @@ int main(void) {
             lasttime = curtime;
 
             if (checkTermination()) {
-                printf("************************");
+
+		printf("****************************terminating in parent process**************************************************");
+
                 terminateSimulation();
                 int status;
                 // block till all children exits
@@ -563,13 +565,13 @@ int main(void) {
             if (r == 0) break;
             else {
                 int pr = random();
-                usleep(pr % 5555 + 5e5);
+                usleep(pr % 5555 +  5e5);
             }
         }
         int rn = random();
-        if (rn % 4 == 0) sheep(1e6 + rn % 5555);
-        else if (rn % 4 == 1) cow(1e6 + rn % 6666);
-        else if (rn % 4 == 2) hunter(1e6 + rn % 7777);
-        else if (rn % 4 == 3) thief(1e6 + rn % 8888);
+        if (rn % 4 == 0) sheep(5e6 + rn % 5555);
+        else if (rn % 4 == 1) cow(5e6 + rn % 6666);
+        else if (rn % 4 == 2) hunter(5e6 + rn % 7777);
+        else if (rn % 4 == 3) thief(5e6 + rn % 8888);
     }
 }
