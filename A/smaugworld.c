@@ -393,8 +393,11 @@ void terminateSimulation() {
 void releaseResource() {
     printf("Releasing Resources\n");
 
-    if(semctl(semID, 0, IPC_RMID, seminfo)==-1) {
+    if(semctl(semID, 0, IPC_RMID)==-1) {
         printf("Release Semaphores Failed\n");
+    }
+    else {
+	printf("Release Semaphores Success\n");
     }
 
     //shared memory for dragon
