@@ -211,7 +211,7 @@ void releaseResource();
 void semctlChecked(int semID, int semNum, int flag, union semun seminfo);
 void semopChecked(int semID, struct sembuf *operation, unsigned num);
 void shmAllocate(key_t key, size_t size, int shmflg1, const void *shmaddr, int shmflg2, int *flag, int **addr);
-void shmDeallocate(int *ptr);
+void shmDeallocate(int flg, int *ptr);
 
 void setTerminate();
 int checkSheep();

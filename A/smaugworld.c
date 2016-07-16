@@ -644,8 +644,8 @@ int main(void) {
         //=============================================================
         if(genflag == 0) sheep(rand()%sheepSleepTime);
         else if(genflag == 1) cow(rand()%cowSleepTime);
-        else if(genflag == 2); //thief(rand()%thiefPathTime);
-        else if(genflag == 3); //hunter(rand()%hunterPathTime);
+        else if(genflag == 2) thief(rand()%thiefPathTime);
+        else if(genflag == 3) hunter(rand()%hunterPathTime);
 	exit(0);
     }
 }
