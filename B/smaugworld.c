@@ -2,6 +2,9 @@
 // Created by Bernard Yuan on 2016-07-11.
 //
 #include "smaugworld.h"
+#include "smaug.h"
+#include "sheep.h"
+#include "cow.h"
 
 //global variables
 int numMeal;
