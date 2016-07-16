@@ -520,7 +520,6 @@ int checkTermination() {
 
 int main(void) {
     initialize();
-    pid_t result = fork();
     srand(time(NULL));
 
     int SHEEP_INTERVAL = 0;
@@ -568,10 +567,12 @@ int main(void) {
 
     long long elapsetime = 0;
     long long lastelapsetime = 0;
-    struct timeval lasttime = 0;
-    struct timeval curtime = 0;
+    struct timeval lasttime;
+    struct timeval curtime;
     gettimeofday(&lasttime, NULL);
 
+    //produce smaug
+    pid_t result = fork();
     if (result < 0) {
         printf("fork error\n");
         exit(1);
@@ -583,7 +584,9 @@ int main(void) {
         pid_t r;
         while (1) {
             gettimeofday(&curtime, NULL);
-            elapsetime = (curtime.tv_sec - lasttime.tv_sec)*1000000 + (curtime.tv_usec - lasttime.tv_usec);
+            elapsetime += (curtime.tv_sec - lasttime.tv_sec)*1000000 + (curtime.tv_usec - lasttime.tv_usec);
+	    pid_t localpid = getpid();
+	    //printf("In process: %d Elapsed time: %lld\n", localpid,elapsetime);
 //            if(elapsetime - lastelapsetime >= 500000)
             lasttime = curtime;
 
@@ -631,7 +634,8 @@ int main(void) {
         //=============================================================
         if(genflag == 0) sheep(rand()%sheepSleepTime);
         else if(genflag == 1) cow(rand()%cowSleepTime);
-        else if(genflag == 2) thief(rand()%thiefPathTime);
-        else if(genflag == 3) hunter(rand()%hunterPathTime);
+        else if(genflag == 2); //thief(rand()%thiefPathTime);
+        else if(genflag == 3); //hunter(rand()%hunterPathTime);
+	exit(0);
     }
 }
