@@ -47,21 +47,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="sheep.c" pinned="false" current-in-tab="false">
+      <file leaf-file-name="sheep.c" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/A/sheep.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="113">
-              <caret line="107" column="26" selection-start-line="107" selection-start-column="26" selection-end-line="107" selection-end-column="26" />
+            <state relative-caret-position="135">
+              <caret line="102" column="41" selection-start-line="102" selection-start-column="41" selection-end-line="102" selection-end-column="41" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="smaug.c" pinned="false" current-in-tab="true">
+      <file leaf-file-name="smaug.c" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/A/smaug.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
-              <caret line="28" column="41" selection-start-line="28" selection-start-column="41" selection-end-line="28" selection-end-column="41" />
+            <state relative-caret-position="225">
+              <caret line="30" column="26" selection-start-line="30" selection-start-column="26" selection-end-line="30" selection-end-column="26" />
               <folding />
             </state>
           </provider>
@@ -128,8 +128,8 @@
         <option value="$PROJECT_DIR$/A/smaugworld.h" />
         <option value="$PROJECT_DIR$/A/smaugworld.c" />
         <option value="$PROJECT_DIR$/A/cow.c" />
-        <option value="$PROJECT_DIR$/A/sheep.c" />
         <option value="$PROJECT_DIR$/A/smaug.c" />
+        <option value="$PROJECT_DIR$/A/sheep.c" />
       </list>
     </option>
   </component>
@@ -620,14 +620,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/A/smaugworld.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="185">
-          <caret line="449" column="30" selection-start-line="449" selection-start-column="30" selection-end-line="449" selection-end-column="30" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/A/cow.c">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="128">
@@ -636,18 +628,26 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/A/sheep.c">
+    <entry file="file://$PROJECT_DIR$/A/smaugworld.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="113">
-          <caret line="107" column="26" selection-start-line="107" selection-start-column="26" selection-end-line="107" selection-end-column="26" />
+        <state relative-caret-position="185">
+          <caret line="449" column="30" selection-start-line="449" selection-start-column="30" selection-end-line="449" selection-end-column="30" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/A/smaug.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="28" column="41" selection-start-line="28" selection-start-column="41" selection-end-line="28" selection-end-column="41" />
+        <state relative-caret-position="225">
+          <caret line="30" column="26" selection-start-line="30" selection-start-column="26" selection-end-line="30" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/A/sheep.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="102" column="41" selection-start-line="102" selection-start-column="41" selection-end-line="102" selection-end-column="41" />
           <folding />
         </state>
       </provider>

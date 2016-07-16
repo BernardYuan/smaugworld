@@ -100,7 +100,7 @@ void sheep(int time) {
             *numMealSheep = *numMealSheep - 1;
         }
 
-        for (i = 0; i < COW_IN_MEAL ; i--) {
+        for (i = 0; i < COW_IN_MEAL ; i++) {
             semopChecked(semID, &WaitNMealCow, 1);
             *numMealCow = *numMealCow - 1;
         }
