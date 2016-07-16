@@ -33,7 +33,7 @@
 
 //process group ids
 extern pid_t smaugID;
-extern const pid_t dragonGID;00
+extern const pid_t dragonGID;
 extern const pid_t beastGID;
 extern const pid_t thiefGID;
 extern const pid_t hunterGID;
