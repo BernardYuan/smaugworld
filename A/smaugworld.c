@@ -523,6 +523,16 @@ int main(void) {
     pid_t result = fork();
     srand(time(NULL));
 
+    int SHEEP_INTERVAL = 0;
+    int COW_INTERVAL = 0;
+    int THIEF_INTERVAL = 0;
+    int HUNTER_INTERVAL = 0;
+
+    long long elapsetime = 0;
+    struct timeval lasttime = 0;
+    struct timeval curtime = 0;
+    gettimeofday(&lasttime, NULL);
+
     if (result < 0) {
         printf("fork error\n");
         exit(1);
@@ -533,9 +543,19 @@ int main(void) {
     else {
         pid_t r;
         while (1) {
-            int status;
+
+            gettimeofday(&curtime, NULL);
+
+            elapsetime = (curtime.tv_sec - lasttime.tv_sec)*1000000 + (curtime.tv_usec - lasttime.tv_usec);
+            lasttime = curtime;
+
             if (checkTermination()) {
+                printf("************************");
                 terminateSimulation();
+                int status;
+                // block till all children exits
+                waitpid(-1, &status, 0);
+                printf("In main: all children have exited\n");
                 releaseResource();
                 exit(0);
             }
