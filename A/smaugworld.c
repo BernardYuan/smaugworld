@@ -408,28 +408,28 @@ void releaseResource() {
     }
 
     //shared memory for dragon
-    shmDeallocate(numDragonJewel);
+    shmDeallocate(numDragonJewelFlag, numDragonJewel);
     //shared memory for meal
-    shmDeallocate(numMeal);
-    shmDeallocate(numEatenMeal);
+    shmDeallocate(numMealFlag, numMeal);
+    shmDeallocate(numEatenMealFlag, numEatenMeal);
     //shared memory for sheep
-    shmDeallocate(SheepInValley);
-    shmDeallocate(numSheepToEat);
-    shmDeallocate(numSheepEaten);
-    shmDeallocate(numMealSheep);
+    shmDeallocate(SheepInValleyFlag, SheepInValley);
+    shmDeallocate(numSheepToEatFlag, numSheepToEat);
+    shmDeallocate(numSheepEatenFlag, numSheepEaten);
+    shmDeallocate(numMealSheepFlag, numMealSheep);
     //shared memory for cow
-    shmDeallocate(CowInValley);
-    shmDeallocate(numCowToEat);
-    shmDeallocate(numCowEaten);
-    shmDeallocate(numMealCow);
+    shmDeallocate(CowInValleyFlag, CowInValley);
+    shmDeallocate(numCowToEatFlag, numCowToEat);
+    shmDeallocate(numCowEatenFlag, numCowEaten);
+    shmDeallocate(numMealCowFlag, numMealCow);
     //shared memory for hunter
-    shmDeallocate(numHunterPath);
-    shmDeallocate(numHunterLeave);
+    shmDeallocate(numHunterPathFlag, numHunterPath);
+    shmDeallocate(numHunterLeaveFlag, numHunterLeave);
     //shared memory for thief
-    shmDeallocate(numThiefPath);
-    shmDeallocate(numThiefLeave);
+    shmDeallocate(numThiefPathFlag, numThiefPath);
+    shmDeallocate(numThiefLeaveFlag, numThiefLeave);
     //shared memory for the system
-    shmDeallocate(flagTermination);
+    shmDeallocate(flagTerminationFlag, flagTermination);
 }
 
 //the function which sets the termination
