@@ -1,7 +1,7 @@
 //
 // Created by Bernard Yuan on 2016-07-12.
 //
-void eat() {
+void* eat(void* arg) {
     sem_wait(&semNMeal);
     numMeal = numMeal - 1;
 
