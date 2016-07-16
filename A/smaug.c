@@ -126,6 +126,11 @@ void smaug() {
     printf("ProcessID of smaug: %d\n", smaugID);
     setpgid(smaugID, dragonGID);
     printf("Smaug is sleeping\n");
+
+    semopChecked(semID, &WaitPDragonJewel, 1);
+    *numDragonJewel = INIT_JEWEL;
+    semopChecked(semID, &SignalPDragonJewel, 1);
+
     semopChecked(semID, &WaitSDragonWakeUp, 1);
     newWakeup = 1;
     int time = 0;

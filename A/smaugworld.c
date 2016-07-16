@@ -528,7 +528,46 @@ int main(void) {
     int THIEF_INTERVAL = 0;
     int HUNTER_INTERVAL = 0;
 
+    long long sheep_time = 0;
+    long long cow_time = 0;
+    long long thief_time = 0;
+    long long hunter_time = 0;
+
+    int sheepSleepTime = 0;
+    int cowSleepTime = 0;
+    int thiefPathTime = 0;
+    int hunterPathTime = 0;
+
+    //========================================================
+    printf("Input the Sheep Interval:\n");
+    scanf("%d", &SHEEP_INTERVAL);
+    printf("Input the maximum time that a sheep grazes:\n");
+    scanf("%d", &sheepSleepTime);
+    //=======================================================
+    printf("Input the Cow Interval:\n");
+    scanf("%d", &COW_INTERVAL);
+    printf("Input the maximum time that a cow grazes:\n");
+    scanf("%d", &cowSleepTime);
+    //=======================================================
+    printf("Input the Thief Interval:\n");
+    scanf("%d", &THIEF_INTERVAL);
+    printf("Input the maximum time that a thief looks for the path:\n");
+    scanf("%d", &thiefPathTime);
+    //========================================================
+    printf("Input the Hunter Interval:\n");
+    scanf("%d", &HUNTER_INTERVAL);
+    printf("Input the maximum time that a hunter looks for the path:\n");
+    scanf("%d", &hunterPathTime);
+    //========================================================
+
+    sheep_time += SHEEP_INTERVAL;
+    cow_time += COW_INTERVAL;
+    thief_time += THIEF_INTERVAL;
+    hunter_time += HUNTER_INTERVAL;
+    int genflag = 0; // the flag tells what to generate
+
     long long elapsetime = 0;
+    long long lastelapsetime = 0;
     struct timeval lasttime = 0;
     struct timeval curtime = 0;
     gettimeofday(&lasttime, NULL);
@@ -543,15 +582,14 @@ int main(void) {
     else {
         pid_t r;
         while (1) {
-
             gettimeofday(&curtime, NULL);
-
             elapsetime = (curtime.tv_sec - lasttime.tv_sec)*1000000 + (curtime.tv_usec - lasttime.tv_usec);
+//            if(elapsetime - lastelapsetime >= 500000)
             lasttime = curtime;
 
             if (checkTermination()) {
 
-		printf("****************************terminating in parent process**************************************************");
+		        printf("****************************terminating in parent process**************************************************");
 
                 terminateSimulation();
                 int status;
@@ -561,17 +599,39 @@ int main(void) {
                 releaseResource();
                 exit(0);
             }
-            r = fork();
-            if (r == 0) break;
-            else {
-                int pr = random();
-                usleep(pr % 5555 +  5e5);
+
+            if(elapsetime > sheep_time) {
+                genflag = 0;
+                sheep_time += SHEEP_INTERVAL;
+                r = fork();
+                if(r==0) break;
+            }
+
+            if(elapsetime > cow_time) {
+                genflag = 1;
+                cow_time += COW_INTERVAL;
+                r = fork();
+                if(r==0) break;
+            }
+
+            if(elapsetime > thief_time) {
+                genflag = 2;
+                thief_time += THIEF_INTERVAL;
+                r = fork();
+                if(r==0) break;
+            }
+
+            if(elapsetime > hunter_time) {
+                genflag = 3;
+                hunter_time += HUNTER_INTERVAL;
+                r = fork();
+                if(r==0) break;
             }
         }
-        int rn = random();
-        if (rn % 4 == 0) sheep(5e6 + rn % 5555);
-        else if (rn % 4 == 1) cow(5e6 + rn % 6666);
-        else if (rn % 4 == 2) hunter(5e6 + rn % 7777);
-        else if (rn % 4 == 3) thief(5e6 + rn % 8888);
+        //=============================================================
+        if(genflag == 0) sheep(rand()%sheepSleepTime);
+        else if(genflag == 1) cow(rand()%cowSleepTime);
+        else if(genflag == 2) thief(rand()%thiefPathTime);
+        else if(genflag == 3) hunter(rand()%hunterPathTime);
     }
 }

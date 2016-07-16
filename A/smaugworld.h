@@ -21,6 +21,7 @@
 #define MAX_THIEF 15
 #define MAX_JEWEL 800
 #define MIN_JEWEL 0
+#define INIT_JEWEL 400
 
 //# of sheep and cows in one meal
 #define SHEEP_IN_MEAL 2
