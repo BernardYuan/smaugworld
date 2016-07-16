@@ -105,7 +105,7 @@ void sheep(int time) {
             *numMealCow = *numMealCow - 1;
         }
 
-        printf("The last sheep in the snack is eaten, smaug finishes the snack\n");
+        printf("The last Sheep in the snack is eaten, smaug finishes the snack\n");
         semopChecked(semID, &SignalPMealCow, 1);
         semopChecked(semID, &SignalPMealSheep, 1);
         semopChecked(semID, &SignalSMealDone, 1);

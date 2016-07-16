@@ -26,6 +26,7 @@ void eat() {
     }
 
     //waiting the meal to be done
+    printf("Smaug waiting the meal done\n");
     semopChecked(semID, &WaitSMealDone, 1);
     //decrement the number of meals
     *numMeal = *numMeal - 1;

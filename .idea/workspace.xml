@@ -13,7 +13,8 @@
   <component name="ChangeListManager">
     <list default="true" id="7c73198f-4199-4625-b140-9c2bb7fbcf30" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/A/smaugworld.c" afterPath="$PROJECT_DIR$/A/smaugworld.c" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/A/sheep.c" afterPath="$PROJECT_DIR$/A/sheep.c" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/A/smaug.c" afterPath="$PROJECT_DIR$/A/smaug.c" />
     </list>
     <ignored path="smaugworld.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -46,20 +47,30 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="smaug.c" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/A/smaug.c">
+      <file leaf-file-name="sheep.c" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/A/sheep.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
-              <caret line="33" column="31" selection-start-line="33" selection-start-column="31" selection-end-line="33" selection-end-column="31" />
+            <state relative-caret-position="113">
+              <caret line="107" column="26" selection-start-line="107" selection-start-column="26" selection-end-line="107" selection-end-column="26" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="cow.c" pinned="false" current-in-tab="true">
+      <file leaf-file-name="smaug.c" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/A/smaug.c">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="195">
+              <caret line="28" column="41" selection-start-line="28" selection-start-column="41" selection-end-line="28" selection-end-column="41" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="cow.c" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/A/cow.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="293">
+            <state relative-caret-position="128">
               <caret line="110" column="22" selection-start-line="110" selection-start-column="22" selection-end-line="110" selection-end-column="22" />
               <folding />
             </state>
@@ -112,13 +123,13 @@
         <option value="$PROJECT_DIR$/B/smaug.c" />
         <option value="$PROJECT_DIR$/B/smaugworld.c" />
         <option value="$PROJECT_DIR$/B/smaugworld.h" />
-        <option value="$PROJECT_DIR$/A/sheep.c" />
         <option value="$PROJECT_DIR$/A/thief.c" />
         <option value="$PROJECT_DIR$/A/hunter.c" />
         <option value="$PROJECT_DIR$/A/smaugworld.h" />
-        <option value="$PROJECT_DIR$/A/smaug.c" />
         <option value="$PROJECT_DIR$/A/smaugworld.c" />
         <option value="$PROJECT_DIR$/A/cow.c" />
+        <option value="$PROJECT_DIR$/A/sheep.c" />
+        <option value="$PROJECT_DIR$/A/smaug.c" />
       </list>
     </option>
   </component>
@@ -561,14 +572,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/A/sheep.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-825">
-          <caret line="4" column="32" selection-start-line="4" selection-start-column="32" selection-end-line="4" selection-end-column="32" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/A/sheep.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -625,18 +628,26 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/A/smaug.c">
+    <entry file="file://$PROJECT_DIR$/A/cow.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="33" column="31" selection-start-line="33" selection-start-column="31" selection-end-line="33" selection-end-column="31" />
+        <state relative-caret-position="128">
+          <caret line="110" column="22" selection-start-line="110" selection-start-column="22" selection-end-line="110" selection-end-column="22" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/A/cow.c">
+    <entry file="file://$PROJECT_DIR$/A/sheep.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="293">
-          <caret line="110" column="22" selection-start-line="110" selection-start-column="22" selection-end-line="110" selection-end-column="22" />
+        <state relative-caret-position="113">
+          <caret line="107" column="26" selection-start-line="107" selection-start-column="26" selection-end-line="107" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/A/smaug.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="28" column="41" selection-start-line="28" selection-start-column="41" selection-end-line="28" selection-end-column="41" />
           <folding />
         </state>
       </provider>
