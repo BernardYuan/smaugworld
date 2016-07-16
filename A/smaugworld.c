@@ -346,8 +346,15 @@ void shmAllocate(key_t key, size_t size, int shmflg1, const void *shmaddr, int s
 }
 
 // deallocate memory
-void shmDeallocate(int *ptr) {
+void shmDeallocate(int flg, int *ptr) {
     if (shmdt(ptr) == -1) {
+        printf("Detach shared memory failed\n");
+    }
+    else {
+        printf("Detach shared memory success\n");
+    }
+
+    if(shmctl(flg, IPC_RMID, NULL) == -1) {
         printf("Release shared memory failed\n");
     }
     else {
