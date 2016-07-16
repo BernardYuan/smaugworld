@@ -585,7 +585,7 @@ int main(void) {
         while (1) {
             gettimeofday(&curtime, NULL);
             elapsetime += (curtime.tv_sec - lasttime.tv_sec)*1000000 + (curtime.tv_usec - lasttime.tv_usec);
-	    pid_t localpid = getpid();
+//	        pid_t localpid = getpid();
 	    //printf("In process: %d Elapsed time: %lld\n", localpid,elapsetime);
 //            if(elapsetime - lastelapsetime >= 500000)
             lasttime = curtime;
