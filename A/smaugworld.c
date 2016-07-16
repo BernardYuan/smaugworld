@@ -391,6 +391,7 @@ void terminateSimulation() {
 
 //release resource
 void releaseResource() {
+    printf("Releasing Resources\n");
 
     if(semctl(semID, 0, IPC_RMID, seminfo)==-1) {
         printf("Release Semaphores Failed\n");
@@ -591,7 +592,7 @@ int main(void) {
 
             if (checkTermination()) {
 
-		        printf("****************************terminating in parent process**************************************************");
+		printf("****************************terminating in parent process**************************************************");
 
                 terminateSimulation();
                 int status;
