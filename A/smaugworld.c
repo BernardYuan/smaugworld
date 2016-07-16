@@ -356,10 +356,10 @@ void shmDeallocate(int *ptr) {
 }
 
 void terminateSimulation() {
-    printf("Terminate Simulation is executed now\n");
+
     pid_t localpid = getpid();
     pid_t localgid = getpgid(localpid);
-
+    printf("In process %d Terminate Simulation is executed now\n", localpid);
     if (localgid != dragonGID) {
         if (killpg(dragonGID, SIGKILL) == -1 && errno == EPERM) {
             printf("Dragon not killed\n");
@@ -387,7 +387,6 @@ void terminateSimulation() {
         }
         else printf("Hunters killed\n");
     }
-    exit(0);
 }
 
 //release resource
