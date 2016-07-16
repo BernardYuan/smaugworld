@@ -2,8 +2,8 @@
 // Created by Bernard Yuan on 2016-07-12.
 //
 #include "sheep.h"
-void *sheep(int time) {
-    usleep(time);
+void *sheep(void* time) {
+    usleep((int)time);
     // get the control of two shared variables
     // !!! always keep in this order, to avoid deadlock
     sem_wait(&mtxNumSheepInValley);

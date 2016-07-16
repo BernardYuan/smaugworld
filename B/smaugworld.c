@@ -12,15 +12,14 @@ int numCowInValley;
 int numCowWaiting;
 int numCowEaten;
 int condTerminate;
+
 //semaphores and mutexes
 //dragon
 sem_t semSDragonSleep;
 sem_t semSDragonEat;
-
 //meals
 sem_t semNMeal;
 sem_t mtxNumMeal;
-
 //sheep
 sem_t semNSheepInValley;
 sem_t mtxNumSheepInValley;
@@ -30,7 +29,6 @@ sem_t mtxNumSheepWaiting;
 sem_t semSSheepEaten;
 sem_t mtxNumSheepEaten;
 sem_t semSSheepDie;
-
 //cows
 sem_t semNCowInValley;
 sem_t mtxNumCowInValley;
@@ -40,7 +38,6 @@ sem_t mtxNumCowWaiting;
 sem_t semSCowEaten;
 sem_t mtxNumCowEaten;
 sem_t semSCowDie;
-
 //termination condition
 sem_t mtxCondTerminate;
 
@@ -63,11 +60,9 @@ void initialize() {
     //Cow
     assert(sem_init(&semNCowInValley, 1, 0) == 0);
     assert(sem_init(&mtxNumCowInValley, 1, 1) == 0);
-
     assert(sem_init(&semSCowWaiting, 1, 0) == 0);
     assert(sem_init(&semNCowWaiting, 1, 0) == 0);
     assert(sem_init(&mtxNumCowWaiting, 1, 1) == 0);
-
     assert(sem_init(&semSCowEaten, 1, 0) == 0);
     assert(sem_init(&mtxNumCowEaten, 1, 1) == 0);
     assert(sem_init(&semSCowDie, 1, 0) == 0);
@@ -78,7 +73,7 @@ void initialize() {
 
 int checkSheep() {
     sem_wait(&mtxNumSheepEaten);
-    if(numSheepEaten >= MAX_SHEEP) {
+    if (numSheepEaten >= MAX_SHEEP) {
         sem_wait(&mtxCondTerminate);
         condTerminate = 1;
         sem_post(&mtxCondTerminate);
@@ -93,7 +88,7 @@ int checkSheep() {
 
 int checkCow() {
     sem_wait(&mtxNumCowEaten);
-    if(numCowEaten >= MAX_COW) {
+    if (numCowEaten >= MAX_COW) {
         sem_wait(&mtxCondTerminate);
         condTerminate = 1;
         sem_post(&mtxCondTerminate);
