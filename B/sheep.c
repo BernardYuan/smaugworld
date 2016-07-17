@@ -8,7 +8,6 @@ void *sheep(void* arg) {
 
     printf("Sheep %d is grazing for %d usec\n", id, time);
     usleep(time);
-    printf("Sheep %d is enchanted\n", id);
 
     // get the control of two shared variables
     // !!! always keep in this order, to avoid deadlock
@@ -16,7 +15,7 @@ void *sheep(void* arg) {
     sem_wait(&mtxNumCowInValley);
     numSheepInValley += 1;
     sem_post(&semNSheepInValley);
-    printf("Now %d sheep and %d cows in valley\n", numSheepInValley, numCowInValley);
+    printf("Sheep %d is enchanted, Now %d sheep and %d cows in valley\n", id, numSheepInValley, numCowInValley);
 	
     if (numSheepInValley >= SHEEP_IN_MEAL && numCowInValley >= COW_IN_MEAL) {
         int i;
@@ -93,7 +92,7 @@ void *sheep(void* arg) {
 	}
 	sem_post(&mtxNumMealCow);
 	sem_post(&mtxNumMealSheep);
-	printf("The last sheep %d dies and the snack is done\n", id);
+	//printf("The last sheep %d dies and the snack is done\n", id);
 	sem_post(&semSMealDone);
 	pthread_exit(NULL);
 }

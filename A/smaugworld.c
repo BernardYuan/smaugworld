@@ -548,24 +548,24 @@ int main(void) {
     int hunterPathTime = 0;
 
     //========================================================
-    printf("Input the Sheep Interval:\n");
+    printf("Input the Sheep Interval:");
     scanf("%d", &SHEEP_INTERVAL);
-    printf("Input the maximum time that a sheep grazes:\n");
+    printf("Input the maximum time that a sheep grazes:");
     scanf("%d", &sheepSleepTime);
     //=======================================================
-    printf("Input the Cow Interval:\n");
+    printf("Input the Cow Interval:");
     scanf("%d", &COW_INTERVAL);
-    printf("Input the maximum time that a cow grazes:\n");
+    printf("Input the maximum time that a cow grazes:");
     scanf("%d", &cowSleepTime);
     //=======================================================
-    printf("Input the Thief Interval:\n");
+    printf("Input the Thief Interval:");
     scanf("%d", &THIEF_INTERVAL);
-    printf("Input the maximum time that a thief looks for the path:\n");
+    printf("Input the maximum time that a thief looks for the path:");
     scanf("%d", &thiefPathTime);
     //========================================================
-    printf("Input the Hunter Interval:\n");
+    printf("Input the Hunter Interval:");
     scanf("%d", &HUNTER_INTERVAL);
-    printf("Input the maximum time that a hunter looks for the path:\n");
+    printf("Input the maximum time that a hunter looks for the path:");
     scanf("%d", &hunterPathTime);
     //========================================================
 

@@ -48,7 +48,14 @@ void* smaug(void *arg) {
 				onceMeal ++;
 			}
 			sem_post(&mtxNumMeal);
-            swim();
+			if(onceMeal > 0) {
+				swim();
+				continue;
+			}
+			else {
+				printf("Smaug finds nothing\n");
+				break;
+			}
         }
 		if(checkTerminate()) break;
 		printf("Smaug goes to sleep\n");
