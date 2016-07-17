@@ -1,7 +1,4 @@
-#include "smaugworld.h"
-#include "smaug.h"
-#include "sheep.h"
-#include "cow.h"
+#include "smaugThread.h"
 
 //global variables
 int numMeal;

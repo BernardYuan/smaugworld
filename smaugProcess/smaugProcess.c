@@ -1,4 +1,4 @@
-#include "smaugprocess.h"
+#include "smaugProcess.h"
 
 //global variables
 int semID;
@@ -887,7 +887,7 @@ void fight() {
 
     semopChecked(semID, &WaitNHunterPath, 1);
     *numHunterPath = *numHunterPath - 1;
-    printf("DRAGONDRAGONDRAGON      Smaug is ready to interact with a hunter waiting in the path");
+    printf("DRAGONDRAGONDRAGON      Smaug is ready to interact with a hunter waiting in the path\n");
     semopChecked(semID, &SignalSHunterCave, 1);
 
     semopChecked(semID, &WaitSDragonFight, 1);
@@ -908,7 +908,7 @@ void fight() {
         printf("DRAGONDRAGONDRAGON      Smaug gives 10 jewels, now it has %d jewels\n", *numDragonJewel);
     }
         else {
-        printf("DRAGONDRAGONDRAGON      Smaug does not have enough jewels, the simulation will terminate\n", *numDragonJewel);
+        printf("DRAGONDRAGONDRAGON      Smaug does not have enough jewels, the simulation will terminate\n");
         setTerminate();
         terminateSimulation();
         
@@ -926,7 +926,7 @@ void play() {
 
     semopChecked(semID, &WaitNThiefPath, 1);
     *numThiefPath = *numThiefPath - 1;
-    printf("DRAGONDRAGONDRAGON      Smaug is ready to interact with a thief waiting in the path");
+    printf("DRAGONDRAGONDRAGON      Smaug is ready to interact with a thief waiting in the path\n");
     semopChecked(semID, &SignalSThiefCave, 1);
 
     semopChecked(semID, &WaitSDragonPlay, 1);
