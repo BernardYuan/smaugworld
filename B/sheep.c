@@ -3,8 +3,8 @@
 //
 #include "sheep.h"
 void *sheep(void* arg) {
-    int time = ((struct beastarg)arg).time;
-    int id = ((struct beastarg)arg).no;
+    int time = ((struct beastarg *)arg)->time;
+    int id = ((struct beastarg *)arg)->no;
 
     printf("Sheep %d is grazing for %d usec\n", id, time);
     usleep(time);

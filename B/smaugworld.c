@@ -191,14 +191,16 @@ int main(void) {
 		if(elapseTime > sheepTime) {
             sheeparg.time = rand() % sheepGraze;
             sheeparg.no ++;
-			pthread_create(&tSheep, NULL, sheep, (void *)sheeparg);
+            struct beastarg temp = sheeparg;
+			pthread_create(&tSheep, NULL, sheep, (void *)(&temp));
 			sheepTime += sheepInterval;
 		}
 		
 		if(elapseTime > cowTime) {
             cowarg.time = rand() % cowGraze;
             cowarg.no ++;
-			pthread_create(&tCow, NULL, cow, (void *)cowarg);
+            struct beastarg temp = cowarg;
+			pthread_create(&tCow, NULL, cow, (void *)(&temp));
 			cowTime += cowInterval;
 		}
     }
