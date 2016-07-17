@@ -2,8 +2,7 @@
 // Created by Bernard Yuan on 2016-07-12.
 //
 #include "smaug.h"
-void eat() {
-	//first make sure that there is indeed one meal
+void* eat(void* arg) {
     sem_wait(&semNMeal);
     int i;
     for (i = 0; i < SHEEP_IN_MEAL; i++) {
