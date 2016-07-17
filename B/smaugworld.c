@@ -92,6 +92,43 @@ void initialize() {
 
 void releaseResource() {
 	printf("Release Sempahores\n");
+    // Dragon
+    assert(sem_destroy(&semSDragonSleep) == 0);
+    assert(sem_destroy(&semSDragonEat) == 0);
+
+    //Meal
+    assert(sem_destroy(&semNMeal) == 0);
+    assert(sem_destroy(&mtxNumMeal) == 0);
+
+    // new for meal
+    assert(sem_destroy(&semNMealSheep) == 0);
+    assert(sem_destroy(&semNMealCow) == 0);
+    assert(sem_destroy(&mtxNumMealSheep) == 0);
+    assert(sem_destroy(&mtxNumMealCow) == 0);
+    assert(sem_destroy(&semSMealDone) == 0);
+
+    //Sheep
+    assert(sem_destroy(&semNSheepInValley) == 0);
+    assert(sem_destroy(&mtxNumSheepInValley) == 0);
+    assert(sem_destroy(&semSSheepWaiting) == 0);
+    assert(sem_destroy(&semNSheepWaiting) == 0);
+    assert(sem_destroy(&mtxNumSheepWaiting) == 0);
+    assert(sem_destroy(&semSSheepEaten) == 0);
+    assert(sem_destroy(&mtxNumSheepEaten) == 0);
+
+    //Cow
+    assert(sem_destroy(&semNCowInValley) == 0);
+    assert(sem_destroy(&mtxNumCowInValley) == 0);
+    assert(sem_destroy(&semSCowWaiting) == 0);
+    assert(sem_destroy(&semNCowWaiting) == 0);
+    assert(sem_destroy(&mtxNumCowWaiting) == 0);
+    assert(sem_destroy(&semSCowEaten) == 0);
+    assert(sem_destroy(&mtxNumCowEaten) == 0);
+
+    //Termination Condition
+    assert(sem_destroy(&mtxCondTerminate) == 0);
+
+    printf("All semaphores released\n");
 }
 
 
