@@ -6,5 +6,5 @@
 #define SMAUGWORLD_COW_H
 
 #include "smaugworld.h"
-void *cow(int time);
+void* cow(void* time);
 #endif //SMAUGWORLD_COW_H

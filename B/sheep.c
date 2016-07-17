@@ -3,16 +3,20 @@
 //
 #include "sheep.h"
 void *sheep(void* time) {
+    pthread_id_np_t tid = pthread_getthreadid_np();
+    printf("Sheep %d is grazing for %d usec\n", tid, (int)time);
     usleep((int)time);
+    printf("Sheep %d is enchanted\n", tid);
+
     // get the control of two shared variables
     // !!! always keep in this order, to avoid deadlock
     sem_wait(&mtxNumSheepInValley);
     sem_wait(&mtxNumCowInValley);
-
     numSheepInValley += 1;
     sem_post(&semNSheepInValley);
-
-    if (numSheepInValley >= SHEEP_IN_MEAL && numCowInValley > COW_IN_MEAL) {
+    printf("Now %d sheep and %d cows in valley\n", numSheepInValley, numCowInValley);
+	
+    if (numSheepInValley >= SHEEP_IN_MEAL && numCowInValley >= COW_IN_MEAL) {
         int i;
         for (i = 0; i < SHEEP_IN_MEAL; i++) {
             sem_wait(&semNSheepInValley);
@@ -49,7 +53,7 @@ void *sheep(void* time) {
             numSheepWaiting--;
         }
         for (i = 0; i < COW_IN_MEAL; i++) {
-            sum_wait(&semNCowWaiting);
+            sem_wait(&semNCowWaiting);
             numCowWaiting--;
         }
         printf("The last sheep in the snack is ready. Smaug will eat\n");
@@ -59,6 +63,35 @@ void *sheep(void* time) {
     sem_post(&mtxNumSheepWaiting);
 
     sem_wait(&semSSheepEaten);
-    printf("A sheep is dead");
-    sem_post(&semSSheepDie);
+	
+	sem_wait(&mtxNumSheepEaten);
+	numSheepEaten += 1;
+	printf("Sheep %d is dead, now %d sheep eaten\n", tid, numSheepEaten);
+	sem_post(&mtxNumSheepEaten);
+
+	if(checkSheep()) {
+		pthread_exit(NULL);
+	}
+
+	sem_post(&semNMealSheep);
+
+	sem_wait(&mtxNumMealSheep);
+	sem_wait(&mtxNumMealCow);
+	numMealSheep += 1;
+	if(numMealSheep >= SHEEP_IN_MEAL && numMealCow >= COW_IN_MEAL) {
+		int i = 0;
+		for(i = 0 ; i < SHEEP_IN_MEAL ; i++ ) {
+			sem_wait(&semNMealSheep);
+			numMealSheep -= 1;
+		}
+		for(i = 0 ; i < COW_IN_MEAL ; i++ ) {
+			sem_wait(&semNMealCow);
+			numMealCow -= 1;
+		}
+	}
+	sem_post(&mtxNumMealCow);
+	sem_post(&mtxNumMealSheep);
+	printf("The last sheep %d dies and the snack is done\n", tid);
+	sem_post(&semSMealDone);
+	pthread_exit(NULL);
 }

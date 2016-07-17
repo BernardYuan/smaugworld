@@ -1,10 +1,10 @@
 //
 // Created by Bernard Yuan on 2016-07-12.
 //
-void* eat(void* arg) {
+#include "smaug.h"
+void eat() {
+	//first make sure that there is indeed one meal
     sem_wait(&semNMeal);
-    numMeal = numMeal - 1;
-
     int i;
     for (i = 0; i < SHEEP_IN_MEAL; i++) {
         sem_post(&semSSheepWaiting);
@@ -13,27 +13,19 @@ void* eat(void* arg) {
     for (i = 0; i < COW_IN_MEAL; i++) {
         sem_post(&semSCowWaiting);
     }
+	printf("Smaug waits to eat\n");
     sem_wait(&semSDragonEat);
     printf("Smaug starts eating\n");
 
-    //keep in this order to avoid deadlock
-    sem_wait(&mtxNumSheepEaten);
-    sem_wait(&mtxNumCowEaten);
     for (i = 0; i < SHEEP_IN_MEAL; i++) {
         sem_post(&semSSheepEaten);
-        sem_wait(&semSSheepDie);
-        numSheepEaten++;
-        printf("Smaug eats another sheep, now %d sheep eaten\n", numSheepEaten);
     }
-
     for (i = 0; i < COW_IN_MEAL; i++) {
         sem_post(&semSCowEaten);
-        sem_wait(&semSCowDie);
-        numCowEaten++;
-        printf("Smaug eats another cow, now %d cows eaten\n", numCowEaten);
     }
-    sem_post(&mtxNumCowEaten);
-    sem_post(&mtxNumSheepEaten);
+	sem_wait(&semSMealDone);
+	numMeal = numMeal - 1;
+	printf("Smaug eats another meal\n");
 }
 
 void swim() {
@@ -42,45 +34,26 @@ void swim() {
     printf("Smaug finishes swimming\n");
 }
 
-void *smaug() {
-    printf("Smaug sleeps\n");
+void* smaug(void *arg) {
+    printf("Smaug goes to sleep\n");
     sem_wait(&semSDragonSleep);
     while (1) {  //sleeping loop
         printf("Smaug wakes up\n");
         while (1) { //swimming loop
+			int onceMeal = 0;
             sem_wait(&mtxNumMeal);
-            if (numMeal > 0) {
-                printf("Smaug finds a meal\n");
-                eat();
-                sem_post(&mtxNumMeal);
-                if(checkSheep() || checkCow()) {
-                    break;
-                }
-                sem_wait(&mtxNumMeal);
-                if (numMeal > 0) {
-                    printf("Smaug finds the second meal\n");
-                    eat();
-                    sem_post(&mtxNumMeal);
-                    if(checkSheep() || checkCow()) {
-                        break;
-                    }
-                }
-                else {
-                    printf("There is no second meal, smaug goes to swim");
-                    sem_post(&mtxNumMeal);
-                    break;
-                }
-            }
-            else {
-                printf("Smaug finds no meal\n");
-                sem_post(&mtxNumMeal);
-                break;
-            }
+			while(numMeal > 0 && onceMeal < ONCE_MEAL) {
+				printf("Smaug finds the %d-th meal\n", onceMeal);
+				if(onceMeal > 0) sem_wait(&semSDragonSleep);
+				eat();
+				onceMeal ++;
+			}
+			sem_post(&mtxNumMeal);
             swim();
         }
-
-        if(checkTerminate()) break;
+		if(checkTerminate()) break;
+		printf("Smaug goes to sleep\n");
         sem_wait(&semSDragonSleep);
     }
-    pthread_exit();
+    pthread_exit(NULL);
 }

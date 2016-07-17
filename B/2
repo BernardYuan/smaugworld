@@ -7,8 +7,6 @@
 
 //global variables
 int numMeal;
-int numMealSheep;
-int numMealCow;
 int numSheepInValley;
 int numSheepWaiting;
 int numSheepEaten;
@@ -24,12 +22,6 @@ sem_t semSDragonEat;
 //meals
 sem_t semNMeal;
 sem_t mtxNumMeal;
-//new for meals
-sem_t semNMealSheep;
-sem_t semNMealCow;
-sem_t mtxNumMealSheep;
-sem_t mtxNumMealCow;
-sem_t semSMealDone;
 //sheep
 sem_t semNSheepInValley;
 sem_t mtxNumSheepInValley;
@@ -38,6 +30,7 @@ sem_t semNSheepWaiting;
 sem_t mtxNumSheepWaiting;
 sem_t semSSheepEaten;
 sem_t mtxNumSheepEaten;
+sem_t semSSheepDie;
 //cows
 sem_t semNCowInValley;
 sem_t mtxNumCowInValley;
@@ -46,6 +39,7 @@ sem_t semNCowWaiting;
 sem_t mtxNumCowWaiting;
 sem_t semSCowEaten;
 sem_t mtxNumCowEaten;
+sem_t semSCowDie;
 //termination condition
 sem_t mtxCondTerminate;
 
@@ -53,18 +47,9 @@ void initialize() {
     // Dragon
     assert(sem_init(&semSDragonSleep, 1, 0) == 0);
     assert(sem_init(&semSDragonEat, 1, 0) == 0);
-
     //Meal
     assert(sem_init(&semNMeal, 1, 0) == 0);
     assert(sem_init(&mtxNumMeal, 1, 1) == 0);
-
-	// new for meal
-	assert(sem_init(&semNMealSheep, 1, 0) == 0);
-	assert(sem_init(&semNMealCow, 1, 0) == 0);
-	assert(sem_init(&mtxNumMealSheep, 1, 1) == 0);
-	assert(sem_init(&mtxNumMealCow, 1, 1) == 0);
-	assert(sem_init(&semSMealDone, 1, 0) == 0);
-
     //Sheep
     assert(sem_init(&semNSheepInValley, 1, 0) == 0);
     assert(sem_init(&mtxNumSheepInValley, 1, 1) == 0);
@@ -73,8 +58,7 @@ void initialize() {
     assert(sem_init(&mtxNumSheepWaiting, 1, 1) == 0);
     assert(sem_init(&semSSheepEaten, 1, 0) == 0);
     assert(sem_init(&mtxNumSheepEaten, 1, 1) == 0);
-    //assert(sem_init(&semSSheepDie, 1, 0) == 0);
-
+    assert(sem_init(&semSSheepDie, 1, 0) == 0);
     //Cow
     assert(sem_init(&semNCowInValley, 1, 0) == 0);
     assert(sem_init(&mtxNumCowInValley, 1, 1) == 0);
@@ -83,8 +67,7 @@ void initialize() {
     assert(sem_init(&mtxNumCowWaiting, 1, 1) == 0);
     assert(sem_init(&semSCowEaten, 1, 0) == 0);
     assert(sem_init(&mtxNumCowEaten, 1, 1) == 0);
-    //assert(sem_init(&semSCowDie, 1, 0) == 0);
-
+    assert(sem_init(&semSCowDie, 1, 0) == 0);
     //Termination Condition
     assert(sem_init(&mtxCondTerminate, 1, 1) == 0);
     printf("initialization finished\n");
@@ -141,8 +124,8 @@ int main(void) {
     pthread_t tCow;
 
 	long long elapseTime = 0;
-	struct timeval lasttime;
-    struct timeval curtime;
+	struct timeval lasttime = 0;
+    struct timeval curtime = 0;
 	gettimeofday(&lasttime, NULL);
 
 	int sheepInterval = 0;
@@ -171,22 +154,35 @@ int main(void) {
     while (1) {
         if (checkTerminate()) {
 			releaseResource();
-			exit(0);
 		} 
 
 		gettimeofday(&curtime, NULL);
-		elapseTime+=(curtime.tv_sec-lasttime.tv_sec)*1000000 + (curtime.tv_usec - lasttime.tv_usec);
+		elapseTime = (curtime.tv_sec - lasttime.tv_sec)*1000000 + (curtime.tv_usec - lasttime.tv_usec);
 		lasttime = curtime;
 
 		if(elapseTime > sheepTime) {
-			pthread_create(&tSheep, NULL, sheep, (void *)(rand()%sheepGraze)); 
-			sheepTime += sheepInterval;
+			pthread_create(&tSheep, NULL, sheep, NULL);
+
 		}
 		
 		if(elapseTime > cowTime) {
-			pthread_create(&tCow, NULL, cow, (void*)(rand()%cowGraze));
-			cowTime += cowInterval;
 		}
+
+
+
+
+        int gr = rand() % 2;
+        if (gr == 0) {
+            printf("Spawn a new sheep\n");
+            int time = rand() % 5555;
+            pthread_create(&tSheep, NULL, sheep, NULL);
+        }
+        else {
+            printf("Spawn a new cow\n");
+            int time = rand() % 5555;
+            pthread_create(&tCow, NULL, cow, NULL);
+        }
+        usleep(1e6);
     }
     pthread_exit(NULL);
 }

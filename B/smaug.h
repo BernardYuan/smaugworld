@@ -5,5 +5,5 @@
 #ifndef SMAUGWORLD_SMAUG_H
 #define SMAUGWORLD_SMAUG_H
 #include "smaugworld.h"
-void *smaug();
+void* smaug(void *);
 #endif //SMAUGWORLD_SMAUG_H

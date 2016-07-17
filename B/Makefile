@@ -1,5 +1,5 @@
 smaugworld: smaugworld.o smaug.o sheep.o cow.o
-	gcc smaugworld.o smaug.o sheep.o cow.o hunter.o thief.o -o smaugworld -pthread -lrt
+	gcc smaugworld.o smaug.o sheep.o cow.o -o smaugworld -pthread -lrt
 smaugworld.o: smaugworld.c smaugworld.h smaug.h sheep.h
 	gcc -c smaugworld.c
 smaug.o: smaug.c smaugworld.h smaug.h
