@@ -12,9 +12,9 @@ void eat() {
     for (i = 0; i < COW_IN_MEAL; i++) {
         sem_post(&semSCowWaiting);
     }
-	printf("Smaug waits to eat\n");
+
     sem_wait(&semSDragonEat);
-    printf("Smaug starts eating\n");
+    printf("DRAGONDRAGONDRAGON      Smaug starts eating\n");
 
     for (i = 0; i < SHEEP_IN_MEAL; i++) {
         sem_post(&semSSheepEaten);
@@ -24,26 +24,30 @@ void eat() {
     }
 	sem_wait(&semSMealDone);
 	numMeal = numMeal - 1;
-	printf("Smaug eats another meal\n");
+	printf("DRAGONDRAGONDRAGON      Smaug finishes eating\n");
 }
 
 void swim() {
-    printf("Smaug starts swimming\n");
+    printf("DRAGONDRAGONDRAGON      Smaug starts swimming\n");
     usleep(1e6);
-    printf("Smaug finishes swimming\n");
+    printf("DRAGONDRAGONDRAGON      Smaug finishes swimming\n");
 }
 
 void* smaug(void *arg) {
-    printf("Smaug goes to sleep\n");
+    printf("DRAGONDRAGONDRAGON      Smaug is created\n");
+    printf("DRAGONDRAGONDRAGON      Smaug goes to sleep\n");
     sem_wait(&semSDragonSleep);
+    int newWakeup = 1;
     while (1) {  //sleeping loop
-        printf("Smaug wakes up\n");
+        printf("DRAGONDRAGONDRAGON      Smaug wakes up\n");
         while (1) { //swimming loop
 			int onceMeal = 0;
             sem_wait(&mtxNumMeal);
 			while(numMeal > 0 && onceMeal < ONCE_MEAL) {
-				printf("Smaug finds the %d-th meal\n", onceMeal);
-				if(onceMeal > 0) sem_wait(&semSDragonSleep);
+				printf("DRAGONDRAGONDRAGON      Smaug finds the %d-th meal\n", onceMeal+1);
+				if(newWakeup) newWakeup = 0;
+                else sem_wait(&semSDragonSleep);
+
 				eat();
 				onceMeal ++;
 			}
@@ -53,13 +57,14 @@ void* smaug(void *arg) {
 				continue;
 			}
 			else {
-				printf("Smaug finds nothing\n");
+				printf("DRAGONDRAGONDRAGON      Smaug finds nothing and goes to sleep\n");
 				break;
 			}
         }
 		if(checkTerminate()) break;
-		printf("Smaug goes to sleep\n");
+		printf("DRAGONDRAGONDRAGON      Smaug goes to sleep\n");
         sem_wait(&semSDragonSleep);
+        newWakeup = 1;
     }
     pthread_exit(NULL);
 }

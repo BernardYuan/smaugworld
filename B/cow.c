@@ -6,7 +6,7 @@ void *cow(void* arg) {
     int time = ((struct beastarg*)arg)->time;
     int id = ((struct beastarg*)arg)->no;
 
-    printf("Cow %d is grazing for %d usec\n", id, time);
+    printf("COWCOWCOWCOWCOWCOW      Cow[%d] is grazing for %d usec\n", id, time);
     usleep(time);
 
     // get the control of two shared variables
@@ -15,7 +15,7 @@ void *cow(void* arg) {
     sem_wait(&mtxNumCowInValley);
     numCowInValley += 1;
     sem_post(&semNCowInValley);
-	printf("Cow %d is enchanted, Now there is %d sheep and %d cows in Valley\n", id, numSheepInValley, numCowInValley);
+	printf("COWCOWCOWCOWCOWCOW      Cow[%d] is enchanted, Now there is %d sheep and %d cows in Valley\n", id, numSheepInValley, numCowInValley);
 
     if (numSheepInValley >= SHEEP_IN_MEAL && numCowInValley >= COW_IN_MEAL) {
         int i;
@@ -30,7 +30,7 @@ void *cow(void* arg) {
         sem_wait(&mtxNumMeal);
         sem_post(&semNMeal);
         numMeal += 1;
-        printf("A new meal is added, now there are %d meals\n", numMeal);
+        printf("COWCOWCOWCOWCOWCOW      Cow[%d] results in a new meal, now there are %d meals\n", id, numMeal);
         sem_post(&mtxNumMeal);
         sem_post(&semSDragonSleep);
     }
@@ -39,6 +39,7 @@ void *cow(void* arg) {
     sem_post(&mtxNumSheepInValley);
 
     sem_wait(&semSCowWaiting);
+    printf("COWCOWCOWCOWCOWCOW      Cow[%d] will be eaten\n", id);
 
     sem_post(&semNCowWaiting);
     //checking whether all beasts are ready to be eaten
@@ -55,16 +56,16 @@ void *cow(void* arg) {
             sem_wait(&semNCowWaiting);
             numCowWaiting--;
         }
-        printf("The last cow in the snack is ready. Smaug will eat\n");
         sem_post(&semSDragonEat);
     }
     sem_post(&mtxNumCowWaiting);
     sem_post(&mtxNumSheepWaiting);
 
     sem_wait(&semSCowEaten);
+
 	sem_wait(&mtxNumCowEaten);
 	numCowEaten += 1;
-    printf("The cow %d is dead, now %d cows eaten\n", id, numCowEaten);
+    printf("COWCOWCOWCOWCOWCOW      Cow[%d] is eaten, now %d cows eaten\n", id, numCowEaten);
 	sem_post(&mtxNumCowEaten);
 
 	if(checkCow()) {

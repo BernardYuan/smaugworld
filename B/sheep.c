@@ -6,7 +6,7 @@ void *sheep(void* arg) {
     int time = ((struct beastarg *)arg)->time;
     int id = ((struct beastarg *)arg)->no;
 
-    printf("Sheep %d is grazing for %d usec\n", id, time);
+    printf("SHEEPSHEEPSHEEP      Sheep[%d] is grazing for %d usec\n", id, time);
     usleep(time);
 
     // get the control of two shared variables
@@ -15,7 +15,7 @@ void *sheep(void* arg) {
     sem_wait(&mtxNumCowInValley);
     numSheepInValley += 1;
     sem_post(&semNSheepInValley);
-    printf("Sheep %d is enchanted, Now %d sheep and %d cows in valley\n", id, numSheepInValley, numCowInValley);
+    printf("SHEEPSHEEPSHEEP      Sheep[%d] is enchanted, Now %d sheep and %d cows in valley\n", id, numSheepInValley, numCowInValley);
 	
     if (numSheepInValley >= SHEEP_IN_MEAL && numCowInValley >= COW_IN_MEAL) {
         int i;
@@ -31,7 +31,7 @@ void *sheep(void* arg) {
         sem_wait(&mtxNumMeal);
         sem_post(&semNMeal);
         numMeal += 1;
-        printf("A new meal is added, now there are %d meals\n", numMeal);
+
         sem_post(&mtxNumMeal);
         sem_post(&semSDragonSleep);
     }
@@ -40,6 +40,7 @@ void *sheep(void* arg) {
     sem_post(&mtxNumSheepInValley);
 
     sem_wait(&semSSheepWaiting);
+    printf("SHEEPSHEEPSHEEP      Sheep[%d] will be eaten\n", id);
 
     sem_post(&semNSheepWaiting);
 
@@ -57,7 +58,7 @@ void *sheep(void* arg) {
             sem_wait(&semNCowWaiting);
             numCowWaiting--;
         }
-        printf("The last sheep in the snack is ready. Smaug will eat\n");
+
         sem_post(&semSDragonEat);
     }
     sem_post(&mtxNumCowWaiting);
@@ -67,7 +68,7 @@ void *sheep(void* arg) {
 	
 	sem_wait(&mtxNumSheepEaten);
 	numSheepEaten += 1;
-	printf("Sheep %d is dead, now %d sheep eaten\n", id, numSheepEaten);
+	printf("SHEEPSHEEPSHEEP      Sheep[%d] is eaten, now %d sheep eaten\n", id, numSheepEaten);
 	sem_post(&mtxNumSheepEaten);
 
 	if(checkSheep()) {
