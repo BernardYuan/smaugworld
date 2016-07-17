@@ -2,7 +2,7 @@
 // Created by Bernard Yuan on 2016-07-12.
 //
 #include "smaug.h"
-void* eat(void* arg) {
+void eat() {
     sem_wait(&semNMeal);
     int i;
     for (i = 0; i < SHEEP_IN_MEAL; i++) {

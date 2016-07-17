@@ -17,3 +17,47 @@ unknown diff
 /home/bernardy/smaugworld/.git/MERGE_MSG
 /home/bernardy/smaugworld/.git/MERGE_MSG
 /home/bernardy/smaugworld/.git/MERGE_MSG
+
+*** These modified files were found in JOE when it aborted on Sat Jul 16 19:25:36 2016
+*** JOE was aborted by UNIX signal 15
+
+*** File '(Unnamed)'
+SPLTMP=ispell.tmp;cat >$SPLTMP;aspell --lang=en_CA.utf-8 -x -c $SPLTMP </dev/tty >/dev/tty;cat $SPLTMP;/bin/rm $SPLTMP
+
+*** File '/home/bernardy/smaugworld/.git/COMMIT_EDITMSG'
+Merge branch 'master' of github.com:BernardYuan/smaugworld
+
+Conflicts:
+	B/cow.c
+	B/sheep.c
+	B/smaug.c
+	B/smaugworld.c
+#
+# It looks like you may be committing a merge.
+# If this is not correct, please remove the file
+#	.git/MERGE_HEAD
+# and try again.
+
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch master
+# Your branch and 'origin/master' have diverged,
+# and have 4 and 2 different commits each, respectively.
+#   (use "git pull" to merge the remote branch into yours)
+#
+# All conflicts fixed but you are still merging.
+#
+# Changes to be committed:
+#	modified:   cow.c
+#	modified:   sheep.c
+#	modified:   smaug.c
+#	modified:   smaugworld.c
+#
+merge files
+*** File '(Unnamed)'
+/home/bernardy/smaugworld/.git/MERGE_MSG
+/home/bernardy/smaugworld/.git/MERGE_MSG
+/home/bernardy/smaugworld/.git/MERGE_MSG
+/home/bernardy/smaugworld/.git/MERGE_MSG
+/home/bernardy/smaugworld/.git/COMMIT_EDITMSG

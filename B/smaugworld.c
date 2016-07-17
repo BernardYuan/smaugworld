@@ -90,6 +90,11 @@ void initialize() {
     printf("initialization finished\n");
 }
 
+void releaseResource() {
+	printf("Release Sempahores\n");
+}
+
+
 int checkSheep() {
     sem_wait(&mtxNumSheepEaten);
     if (numSheepEaten >= MAX_SHEEP) {
@@ -204,5 +209,6 @@ int main(void) {
 			cowTime += cowInterval;
 		}
     }
-    pthread_exit(NULL);
+	exit(0);
+    //pthread_exit(NULL);
 }
