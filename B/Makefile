@@ -11,6 +11,6 @@ cow.o: cow.c smaugworld.h cow.h
 
 clean:
 	@echo "cleaning project"
-	rm smaugworld
 	rm *.o
+	rm smaugworld
 	@echo "clean completed"
