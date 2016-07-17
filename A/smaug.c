@@ -1,6 +1,7 @@
 #include "smaug.h"
-int newWakeup = 1;
 //smaug eats a meal
+int newWakeup = 1;
+
 void eat() {
     semopChecked(semID, &WaitNMeal, 1); //guarantee that there is really a meal
     int i;
