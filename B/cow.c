@@ -2,11 +2,13 @@
 // Created by Bernard Yuan on 2016-07-12.
 //
 #include "cow.h"
-void *cow(void* time) {
-    pthread_id_np_t tid = pthread_getthreadid_np();
-    printf("Cow %d is grazing for %d usec\n", tid, (int)time);
-    usleep((int)time);
-	printf("Cow %d is enchanted\n", tid);
+void *cow(void* arg) {
+    int time = ((struct beastarg)arg).time;
+    int id = ((struct beastarg)arg).no;
+
+    printf("Cow %d is grazing for %d usec\n", id, time);
+    usleep(time);
+	printf("Cow %d is enchanted\n", id);
 
     // get the control of two shared variables
     // !!! always keep in this order, to avoid deadlock
@@ -88,7 +90,7 @@ void *cow(void* time) {
 	}
 	sem_post(&mtxNumMealCow);
 	sem_post(&mtxNumMealSheep);
-	printf("The last Cow %d dies and the snack is done\n", tid);
+	printf("The last Cow %d dies and the snack is done\n", id);
 	sem_post(&semSMealDone);
 	pthread_exit(NULL);
 }

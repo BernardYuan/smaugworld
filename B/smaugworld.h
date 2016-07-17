@@ -66,10 +66,16 @@ extern sem_t mtxNumCowEaten;
 extern sem_t semNCowEaten;
 //termination condition
 extern sem_t mtxCondTerminate;
-#endif //SMAUGWORLD_SMAUGWORLD_H
 
+struct beastarg{
+    int time;
+    int no;
+};
 int checkSheep();
 int checkCow();
 int checkTerminate();
 void setTerminate();
 void releaseResource();
+
+#endif //SMAUGWORLD_SMAUGWORLD_H
+

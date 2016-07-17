@@ -140,6 +140,13 @@ int main(void) {
     pthread_t tSheep;
     pthread_t tCow;
 
+    struct beastarg sheeparg;
+    sheeparg.time = 0;
+    sheeparg.no = 0;
+    struct beastarg cowarg;
+    cowarg.time = 0;
+    cowarg.no = 0;
+
 	long long elapseTime = 0;
 	struct timeval lasttime;
     struct timeval curtime;
@@ -165,13 +172,16 @@ int main(void) {
 	sheepTime = sheepInterval;
 	cowTime = cowInterval;
 
+    int cowcount = 1;
+    int sheepcount = 1;
+
     initialize();
     srand(time(NULL));
     pthread_create(&tSmaug, NULL, smaug, NULL);
     while (1) {
         if (checkTerminate()) {
 			releaseResource();
-			exit(0);
+			break;
 		} 
 
 		gettimeofday(&curtime, NULL);
@@ -179,12 +189,16 @@ int main(void) {
 		lasttime = curtime;
 
 		if(elapseTime > sheepTime) {
-			pthread_create(&tSheep, NULL, sheep, (void *)(rand()%sheepGraze)); 
+            sheeparg.time = rand() % sheepGraze;
+            sheeparg.no ++;
+			pthread_create(&tSheep, NULL, sheep, (void *)sheeparg);
 			sheepTime += sheepInterval;
 		}
 		
 		if(elapseTime > cowTime) {
-			pthread_create(&tCow, NULL, cow, (void*)(rand()%cowGraze));
+            cowarg.time = rand() % cowGraze;
+            cowarg.no ++;
+			pthread_create(&tCow, NULL, cow, (void *)cowarg);
 			cowTime += cowInterval;
 		}
     }

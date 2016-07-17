@@ -2,11 +2,13 @@
 // Created by Bernard Yuan on 2016-07-12.
 //
 #include "sheep.h"
-void *sheep(void* time) {
-    pthread_id_np_t tid = pthread_getthreadid_np();
-    printf("Sheep %d is grazing for %d usec\n", tid, (int)time);
-    usleep((int)time);
-    printf("Sheep %d is enchanted\n", tid);
+void *sheep(void* arg) {
+    int time = ((struct beastarg)arg).time;
+    int id = ((struct beastarg)arg).no;
+
+    printf("Sheep %d is grazing for %d usec\n", id, time);
+    usleep(time);
+    printf("Sheep %d is enchanted\n", id);
 
     // get the control of two shared variables
     // !!! always keep in this order, to avoid deadlock
@@ -66,7 +68,7 @@ void *sheep(void* time) {
 	
 	sem_wait(&mtxNumSheepEaten);
 	numSheepEaten += 1;
-	printf("Sheep %d is dead, now %d sheep eaten\n", tid, numSheepEaten);
+	printf("Sheep %d is dead, now %d sheep eaten\n", id, numSheepEaten);
 	sem_post(&mtxNumSheepEaten);
 
 	if(checkSheep()) {
@@ -91,7 +93,7 @@ void *sheep(void* time) {
 	}
 	sem_post(&mtxNumMealCow);
 	sem_post(&mtxNumMealSheep);
-	printf("The last sheep %d dies and the snack is done\n", tid);
+	printf("The last sheep %d dies and the snack is done\n", id);
 	sem_post(&semSMealDone);
 	pthread_exit(NULL);
 }
