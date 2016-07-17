@@ -3,20 +3,20 @@
 void cow(int time) {
     pid_t localpid = getpid();
     setpgid(localpid, beastGID);
-    printf("cow %d is grazing for %d usec\n", localpid, time);
+    printf("COWCOWCOWCOWCOWCOW      Cow[%d] is grazing for %d usec\n", localpid, time);
     //grazing
     if (usleep(time) == -1) {
         /* exit when usleep interrupted by kill signal */
         if (errno == EINTR) exit(4);
     }
-    printf("cow %d is enchanted\n", localpid);
+    printf("\n", localpid);
     //the cow is enchanted
     //keep in this order in all files to avoid deadlock
     semopChecked(semID, &WaitPSheepInValley, 1); //use the number of sheep in valley
     semopChecked(semID, &WaitPCowInValley, 1);   //use the number of cows in valley
     *CowInValley = *CowInValley + 1;
     semopChecked(semID, &SignalNCowInValley, 1);
-    printf("One more cow enters the valley, now %d cows and %d sheep\n", *CowInValley, *SheepInValley);
+    printf("COWCOWCOWCOWCOWCOW      Cow[%d] is enchanted, now %d cows and %d sheep in Valley\n", localpid, *CowInValley, *SheepInValley);
     // There is a meal in the Valley
     if (*CowInValley >= COW_IN_MEAL && *SheepInValley >= SHEEP_IN_MEAL) {
         int i;
@@ -34,7 +34,7 @@ void cow(int time) {
         semopChecked(semID, &WaitPNumMeal, 1);
         semopChecked(semID, &SignalNMeal, 1);
         *numMeal = *numMeal + 1;
-        printf("A new meal is added, now number of meals:%d\n", *numMeal);
+        printf("COWCOWCOWCOWCOWCOW      Cow[%d] results in a new meal, now number of meals:%d\n", localpid, *numMeal);
         semopChecked(semID, &SignalPNumMeal, 1);
         //release the use of shared variables
         semopChecked(semID, &SignalPCowInValley, 1);
@@ -66,7 +66,6 @@ void cow(int time) {
             semopChecked(semID, &WaitNSheepToEat, 1);
             *numSheepToEat = *numSheepToEat - 1;
         }
-        printf("The last cow %d in a meal ready to be eaten signals smaug to eat\n", localpid);
         semopChecked(semID, &SignalPCowToEat, 1);
         semopChecked(semID, &SignalPSheepToEat, 1);
         semopChecked(semID, &SignalSDragonEat, 1);
@@ -83,7 +82,7 @@ void cow(int time) {
     *numCowEaten = *numCowEaten + 1;
     semopChecked(semID, &SignalPCowEaten, 1);
 
-    printf("Cow %d is eaten, now %d cows eaten\n", localpid, *numCowEaten);
+    printf("COWCOWCOWCOWCOWCOW      Cow[%d] is eaten, now %d cows eaten\n", localpid, *numCowEaten);
     if(checkCow()) {
         terminateSimulation();
         exit(0);
@@ -107,8 +106,7 @@ void cow(int time) {
             semopChecked(semID, &WaitNMealCow, 1);
             *numMealCow = *numMealCow - 1;
         }
-
-        printf("The last Cow in the snack is eaten, smaug finishes the snack\n");
+        
         semopChecked(semID, &SignalPMealCow, 1);
         semopChecked(semID, &SignalPMealSheep, 1);
         semopChecked(semID, &SignalSMealDone, 1);

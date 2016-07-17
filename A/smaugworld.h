@@ -22,7 +22,8 @@
 #define MAX_JEWEL 800
 #define MIN_JEWEL 0
 #define INIT_JEWEL 400
-
+#define THIEF_WIN 0.3
+#define HUNTER_WIN 0.3
 //# of sheep and cows in one meal
 #define SHEEP_IN_MEAL 2
 #define COW_IN_MEAL 2

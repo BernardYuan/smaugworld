@@ -6,7 +6,7 @@
 void hunter(int time) {
     pid_t localpid = getpid();
     setpgid(localpid, hunterGID);
-    printf("Hunter %d is looking for the path\n", localpid);
+    printf("HUNTERHUNTERHUNTER      Hunter[%d] is looking for the path\n", localpid);
     int pathtime = random();
     if (usleep(time) == -1) {
         /* exit when usleep interrupted by kill signal */
@@ -18,18 +18,17 @@ void hunter(int time) {
     *numHunterPath = *numHunterPath + 1;
     semopChecked(semID, &SignalPHunterPath, 1);
 
-    printf("Hunter %d enters the magic path, now %d hunters in path\n", localpid, *numHunterPath);
+    printf("HUNTERHUNTERHUNTER      Hunter[%d] enters the magic path, now %d hunters in path\n", localpid, *numHunterPath);
     semopChecked(semID, &SignalSDragonWakeUp, 1);
 
     semopChecked(semID, &WaitSHunterCave, 1);
-    printf("Hunter %d enters the cave\n", localpid);
+    printf("HUNTERHUNTERHUNTER      Hunter[%d] enters the cave\n", localpid);
     semopChecked(semID, &SignalSDragonFight, 1);
     semopChecked(semID, &WaitSHunterFight, 1);
-    printf("Hunter finishes fighting and leaves\n");
 
     semopChecked(semID, &WaitPHunterLeave, 1);
     *numHunterLeave = *numHunterLeave + 1;
-    printf("Smaug has fought %d hunters\n", *numHunterLeave);
+    printf("HUNTERHUNTERHUNTER      Hunter[%d] leaves, now Smaug has fought %d hunters\n", localpid, *numHunterLeave);
     semopChecked(semID, &SignalPHunterLeave, 1);
 
     if(checkHunter()) {

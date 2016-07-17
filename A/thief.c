@@ -5,7 +5,7 @@
 void thief(int time) {
     pid_t localpid = getpid();
     setpgid(localpid, thiefGID);
-    printf("Thief %d is looking for the path\n", localpid);
+    printf("THIEFTHIEFTHIEFTHIEF    Thief[%d] is looking for the path\n", localpid);
 
     if (usleep(time) == -1) {
         /* exit when usleep interrupted by kill signal */
@@ -17,19 +17,18 @@ void thief(int time) {
     *numThiefPath = *numThiefPath + 1;
     semopChecked(semID, &SignalPThiefPath, 1);
 
-    printf("Thief %d enters the magic path, now %d thieves in path\n", localpid, *numThiefPath);
+    printf("THIEFTHIEFTHIEFTHIEF    Thief[%d] enters the magic path, now %d thieves in path\n", localpid, *numThiefPath);
     semopChecked(semID, &SignalSDragonWakeUp, 1);
 
     semopChecked(semID, &WaitSThiefCave, 1);
-    printf("Thief %d enters the cave\n", localpid);
+    printf("THIEFTHIEFTHIEFTHIEF    Thief[%d]enters the cave\n", localpid);
     semopChecked(semID, &SignalSDragonPlay, 1);
 
     semopChecked(semID, &WaitSThiefPlay, 1);
-    printf("Thief finishes playings and leaves\n");
 
     semopChecked(semID, &WaitPThiefLeave, 1);
     *numThiefLeave = *numThiefLeave + 1;
-    printf("Smaug has played with %d thieves\n", *numThiefLeave);
+    printf("THIEFTHIEFTHIEFTHIEF    Thief[%d] leaves, now Smaug has played with %d thieves\n", localpid, *numThiefLeave);
     semopChecked(semID, &SignalPThiefLeave, 1);
     if(checkThief()) {
         terminateSimulation();

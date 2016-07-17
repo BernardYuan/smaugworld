@@ -354,7 +354,7 @@ void shmDeallocate(int flg, int *ptr) {
         printf("Detach shared memory success\n");
     }
 
-    if(shmctl(flg, IPC_RMID, NULL) == -1) {
+    if (shmctl(flg, IPC_RMID, NULL) == -1) {
         printf("Release shared memory failed\n");
     }
     else {
@@ -400,11 +400,11 @@ void terminateSimulation() {
 void releaseResource() {
     printf("Releasing Resources\n");
 
-    if(semctl(semID, 0, IPC_RMID)==-1) {
+    if (semctl(semID, 0, IPC_RMID) == -1) {
         printf("Release Semaphores Failed\n");
     }
     else {
-	printf("Release Semaphores Success\n");
+        printf("Release Semaphores Success\n");
     }
 
     //shared memory for dragon
@@ -594,58 +594,58 @@ int main(void) {
         pid_t r;
         while (1) {
             gettimeofday(&curtime, NULL);
-            elapsetime += (curtime.tv_sec - lasttime.tv_sec)*1000000 + (curtime.tv_usec - lasttime.tv_usec);
+            elapsetime += (curtime.tv_sec - lasttime.tv_sec) * 1000000 + (curtime.tv_usec - lasttime.tv_usec);
 //	        pid_t localpid = getpid();
-	    //printf("In process: %d Elapsed time: %lld\n", localpid,elapsetime);
+            //printf("In process: %d Elapsed time: %lld\n", localpid,elapsetime);
 //            if(elapsetime - lastelapsetime >= 500000)
             lasttime = curtime;
 
             if (checkTermination()) {
 
-		printf("****************************terminating in parent process**************************************************");
+                printf("****************************terminating in parent process**************************************************\n");
 
                 terminateSimulation();
                 int status;
                 // block till all children exits
                 waitpid(-1, &status, 0);
-                printf("In main: all children have exited\n");
+                printf("****************************In main: all children have exited\n");
                 releaseResource();
                 exit(0);
             }
 
-            if(elapsetime > sheep_time) {
+            if (elapsetime > sheep_time) {
                 genflag = 0;
                 sheep_time += SHEEP_INTERVAL;
                 r = fork();
-                if(r==0) break;
+                if (r == 0) break;
             }
 
-            if(elapsetime > cow_time) {
+            if (elapsetime > cow_time) {
                 genflag = 1;
                 cow_time += COW_INTERVAL;
                 r = fork();
-                if(r==0) break;
+                if (r == 0) break;
             }
 
-            if(elapsetime > thief_time) {
+            if (elapsetime > thief_time) {
                 genflag = 2;
                 thief_time += THIEF_INTERVAL;
                 r = fork();
-                if(r==0) break;
+                if (r == 0) break;
             }
 
-            if(elapsetime > hunter_time) {
+            if (elapsetime > hunter_time) {
                 genflag = 3;
                 hunter_time += HUNTER_INTERVAL;
                 r = fork();
-                if(r==0) break;
+                if (r == 0) break;
             }
         }
         //=============================================================
-        if(genflag == 0) sheep(rand()%sheepSleepTime);
-        else if(genflag == 1) cow(rand()%cowSleepTime);
-        else if(genflag == 2) thief(rand()%thiefPathTime);
-        else if(genflag == 3) hunter(rand()%hunterPathTime);
-	exit(0);
+        if (genflag == 0) sheep(rand() % sheepSleepTime);
+        else if (genflag == 1) cow(rand() % cowSleepTime);
+        else if (genflag == 2) thief(rand() % thiefPathTime);
+        else if (genflag == 3) hunter(rand() % hunterPathTime);
+        exit(0);
     }
 }
