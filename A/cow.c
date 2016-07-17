@@ -9,7 +9,6 @@ void cow(int time) {
         /* exit when usleep interrupted by kill signal */
         if (errno == EINTR) exit(4);
     }
-    printf("\n", localpid);
     //the cow is enchanted
     //keep in this order in all files to avoid deadlock
     semopChecked(semID, &WaitPSheepInValley, 1); //use the number of sheep in valley
@@ -106,7 +105,7 @@ void cow(int time) {
             semopChecked(semID, &WaitNMealCow, 1);
             *numMealCow = *numMealCow - 1;
         }
-        
+
         semopChecked(semID, &SignalPMealCow, 1);
         semopChecked(semID, &SignalPMealSheep, 1);
         semopChecked(semID, &SignalSMealDone, 1);

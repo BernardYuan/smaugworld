@@ -9,7 +9,6 @@ void sheep(int time) {
         /* exit when usleep interrupted by kill signal */
         if (errno == EINTR)exit(4);
     }
-    printf("\n", localpid);
     //the sheep is enchanted
 
     //keep in this order to get use
